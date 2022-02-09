@@ -11,22 +11,17 @@ services:
     depends_on:
       - nats
     networks:
-      - development
+      - nats
     cap_add:
       - SYS_PTRACE
     command: /bin/sh -c "while sleep 1000; do :; done"
     user: vscode
 
   nats:
-    image: 'nats:2.7.1-alpine'
-    expose:
-      - "4222"
-    ports:
-      - "8222:8222"
-    hostname: nats-server
-    networks:
-      - development
+    image: nats
+    command: "-js"
+    networks: [ "nats" ]
 
 networks:
-  development:
+  nats:
     driver: bridge
