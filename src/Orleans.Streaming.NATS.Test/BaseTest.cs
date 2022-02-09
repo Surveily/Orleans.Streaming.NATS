@@ -29,7 +29,21 @@ namespace Orleans.Streaming.NATS.Test
                 this.Services.AddTransient<T>();
             }
 
-            this.Subject = this.Services.BuildServiceProvider().GetService<T>();
+            var provider = this.Services.BuildServiceProvider();
+
+            if (provider != null)
+            {
+                var service = provider.GetService<T>();
+
+                if (service != null)
+                {
+                    this.Subject = service;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Subject not registered.");
+                }
+            }
 
             return Task.CompletedTask;
         }
