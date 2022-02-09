@@ -35,7 +35,7 @@ namespace Orleans.Streaming.NATS
         public static ConsumerConfiguration GetConsumer(string stream)
         {
             return ConsumerConfiguration.Builder()
-                                        .WithDurable($"{stream}_durable")
+                                        .WithDurable($"{stream}")
                                         .WithFilterSubject($"{stream}.request")
                                         .Build();
         }
