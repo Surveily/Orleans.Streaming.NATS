@@ -1,0 +1,20 @@
+{
+    "initClass": {
+        "scope": "csharp",
+        "prefix": "initClass",
+        "body": [
+            "$LINE_COMMENT <copyright file=\"${TM_FILENAME}\" company=\"Surveily Sp. z o.o.\">",
+            "$LINE_COMMENT Copyright (c) Surveily Sp. z o.o.. All rights reserved.",
+            "$LINE_COMMENT </copyright>",
+            "",
+            "namespace ${TM_DIRECTORY/.*src\\/(([^\\/]*)(\\/)?)|(\\/)([^\\/]*)/$2${3:+.}${5:+.}$5/g}",
+            "{",
+            "\tpublic class ${TM_FILENAME_BASE}${1}",
+            "\t{",
+            "\t\t${0}",
+            "\t}",
+            "}"
+        ],
+        "description": "Initialize new class"
+    }
+}

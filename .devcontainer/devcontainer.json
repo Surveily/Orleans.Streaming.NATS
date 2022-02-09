@@ -12,9 +12,7 @@
         "/var/run/docker.sock:/var/run/docker.sock",
     ],
     "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh-localhost/* ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/* && mkdir -p ~/.kube && cp -r ~/.kube-localhost/* ~/.kube",
-    "appPort": [
-        "5000:5000"
-    ],
+    "appPort": [],
     "extensions": [
         "kosunix.guid",
         // "adpyke.codesnap",
