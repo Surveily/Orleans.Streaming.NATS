@@ -1,18 +1,8 @@
-// See https://aka.ms/vscode-remote/containers for the
-// documentation about the devcontainer.json format
 {
     "name": "orleans.streaming.nats",
-    "image": "surveily/developer.dotnet:6.0-sdk",
-    "runArgs": [
-        "-v",
-        "${env:HOME}${env:USERPROFILE}/.ssh:/home/vscode/.ssh-localhost:ro",
-        "-v",
-        "${env:HOME}${env:USERPROFILE}/.kube:/home/vscode/.kube-localhost:ro",
-        "-v",
-        "/var/run/docker.sock:/var/run/docker.sock",
-    ],
-    "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh-localhost/* ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/* && mkdir -p ~/.kube && cp -r ~/.kube-localhost/* ~/.kube",
-    "appPort": [],
+    "service": "vscode",
+    "workspaceFolder": "/workspace",
+    "dockerComposeFile": "./docker-compose.yml",
     "extensions": [
         "kosunix.guid",
         // "adpyke.codesnap",
@@ -50,6 +40,6 @@
             "**/BenchmarkDotNet.Artifacts": true
         }
     },
-    "shutdownAction": "stopContainer",
-    "remoteUser": "vscode"
+    "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh-localhost/* ~/.ssh && chmod 700 ~/.ssh",
+    "shutdownAction": "stopCompose"
 }

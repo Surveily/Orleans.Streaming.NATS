@@ -1,0 +1,32 @@
+version: "3.5"
+
+services:
+  vscode:
+    container_name: orleans.streaming.nats
+    image: surveily/developer.dotnet:6.0-sdk
+    volumes:
+      - ../:/workspace:delegated
+      - ~/.ssh:/home/vscode/.ssh-localhost:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - nats
+    networks:
+      - development
+    cap_add:
+      - SYS_PTRACE
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    user: vscode
+
+  nats:
+    image: 'nats:2.7.1-alpine'
+    expose:
+      - "4222"
+    ports:
+      - "8222:8222"
+    hostname: nats-server
+    networks:
+      - development
+
+networks:
+  development:
+    driver: bridge

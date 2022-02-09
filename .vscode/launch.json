@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/Orleans.Streaming.NATS.Console/bin/Debug/net6.0/Orleans.Streaming.NATS.Console.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Orleans.Streaming.NATS.Console",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        }
+    ]
+}

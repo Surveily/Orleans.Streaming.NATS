@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Streaming.NATS", "O
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Streaming.NATS.Test", "Orleans.Streaming.NATS.Test\Orleans.Streaming.NATS.Test.csproj", "{DB16BC35-6785-454B-A958-A3F9F855A4FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Streaming.NATS.Console", "Orleans.Streaming.NATS.Console\Orleans.Streaming.NATS.Console.csproj", "{AF601B38-94CE-40F3-8457-B14B393185DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{DB16BC35-6785-454B-A958-A3F9F855A4FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB16BC35-6785-454B-A958-A3F9F855A4FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB16BC35-6785-454B-A958-A3F9F855A4FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF601B38-94CE-40F3-8457-B14B393185DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF601B38-94CE-40F3-8457-B14B393185DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF601B38-94CE-40F3-8457-B14B393185DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF601B38-94CE-40F3-8457-B14B393185DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
