@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Streaming.NATS", "Orleans.Streaming.NATS\Orleans.Streaming.NATS.csproj", "{BEFC7B30-4A93-4E5A-AAD4-CB3FA09E3420}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.Streaming.NATS.Test", "Orleans.Streaming.NATS.Test\Orleans.Streaming.NATS.Test.csproj", "{DB16BC35-6785-454B-A958-A3F9F855A4FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BEFC7B30-4A93-4E5A-AAD4-CB3FA09E3420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEFC7B30-4A93-4E5A-AAD4-CB3FA09E3420}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEFC7B30-4A93-4E5A-AAD4-CB3FA09E3420}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEFC7B30-4A93-4E5A-AAD4-CB3FA09E3420}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB16BC35-6785-454B-A958-A3F9F855A4FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB16BC35-6785-454B-A958-A3F9F855A4FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB16BC35-6785-454B-A958-A3F9F855A4FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB16BC35-6785-454B-A958-A3F9F855A4FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
