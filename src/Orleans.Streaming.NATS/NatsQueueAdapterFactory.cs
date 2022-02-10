@@ -2,10 +2,12 @@
 // Copyright (c) Surveily Sp. z o.o.. All rights reserved.
 // </copyright>
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NATS.Client.JetStream;
 using Orleans.Configuration;
+using Orleans.Configuration.Overrides;
 using Orleans.Providers.Streams.Common;
 using Orleans.Serialization;
 using Orleans.Streams;
@@ -49,6 +51,16 @@ namespace Orleans.Streaming.NATS
             this.serializationManager = serializationManager;
             this.streamQueueMapper = new HashRingBasedStreamQueueMapper(queueMapperOptions, this.name);
             this.adapterCache = new SimpleQueueAdapterCache(cacheOptions, this.name, this.loggerFactory);
+        }
+
+        public static NatsQueueAdapterFactory Create(IServiceProvider services, string name)
+        {
+            var clusterOptions = services.GetProviderClusterOptions(name);
+            var sqsOptions = services.GetOptionsByName<NatsQueueOptions>(name);
+            var cacheOptions = services.GetOptionsByName<SimpleQueueCacheOptions>(name);
+            var queueMapperOptions = services.GetOptionsByName<HashRingStreamQueueMapperOptions>(name);
+
+            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, sqsOptions, cacheOptions, queueMapperOptions, clusterOptions);
         }
 
         public Task<IQueueAdapter> CreateAdapter()
