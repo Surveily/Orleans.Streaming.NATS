@@ -16,7 +16,6 @@ var subTasks = new List<Task>();
 var cf = new ConnectionFactory();
 var qr = new QueueRepository(cf.CreateConnection("nats://nats:4222"));
 
-//qr.Delete(subject);
 qr.Prepare(stream);
 
 if (args.Length == 0 || args[0] == "s")

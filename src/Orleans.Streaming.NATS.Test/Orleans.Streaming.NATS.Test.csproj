@@ -4,6 +4,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    <PropertyGroup>
+        <CodeAnalysisRuleSet>..\stylecop.ruleset</CodeAnalysisRuleSet>
+    </PropertyGroup>
     <ItemGroup>
         <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
     </ItemGroup>

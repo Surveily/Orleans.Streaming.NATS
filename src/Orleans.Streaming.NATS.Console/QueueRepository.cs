@@ -109,8 +109,6 @@ namespace Nats
             return ConsumerConfiguration.Builder()
                                         .WithDurable($"{stream}")
                                         .WithFilterSubject($"{stream}.request")
-                                        // .WithDeliverGroup($"{stream}_queue")
-                                        // .WithDeliverSubject($"{stream}.request")
                                         .Build();
         }
     }

@@ -13,42 +13,18 @@ namespace Orleans.Streaming.NATS
     /// </summary>
     public class NatsQueueAdapterReceiver : IQueueAdapterReceiver
     {
-        /// <summary>
-        /// Stream name.
-        /// </summary>
         private readonly string stream;
 
-        /// <summary>
-        /// Connection object.
-        /// </summary>
         private readonly IJetStream jetStream;
 
-        /// <summary>
-        /// Serialization manager object.
-        /// </summary>
         private readonly SerializationManager serializationManager;
 
-        /// <summary>
-        /// Timeout object.
-        /// </summary>
         private TimeSpan timeout;
 
-        /// <summary>
-        /// Counter for read messages.
-        /// </summary>
         private long lastReadMessage;
 
-        /// <summary>
-        /// Subscription object.
-        /// </summary>
         private IJetStreamPullSubscription? subscription;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NatsQueueAdapterReceiver"/> class.
-        /// </summary>
-        /// <param name="serializationManager">Serialization manager object.</param>
-        /// <param name="jetStream">Connection object.</param>
-        /// <param name="stream">Stream name.</param>
         public NatsQueueAdapterReceiver(SerializationManager serializationManager, IJetStream jetStream, string stream)
         {
             if (stream == null)
@@ -67,11 +43,6 @@ namespace Orleans.Streaming.NATS
             this.serializationManager = serializationManager;
         }
 
-        /// <summary>
-        /// Pull a batch of messages.
-        /// </summary>
-        /// <param name="maxCount">The number of anticipated messages.</param>
-        /// <returns>List of messages.</returns>
         public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
         {
             var result = new List<IBatchContainer>();
@@ -85,11 +56,6 @@ namespace Orleans.Streaming.NATS
             return Task.FromResult(result as IList<IBatchContainer>);
         }
 
-        /// <summary>
-        /// Create the receiver.
-        /// </summary>
-        /// <param name="timeout">Creation timeout.</param>
-        /// <returns>The task that creates the receiver.</returns>
         public Task Initialize(TimeSpan timeout)
         {
             var cc = Nats.GetConsumer(this.stream);
@@ -103,11 +69,6 @@ namespace Orleans.Streaming.NATS
             return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Acknowledge the messages.
-        /// </summary>
-        /// <param name="messages">Data to ack.</param>
-        /// <returns>The task that acknowledges the messages.</returns>
         public Task MessagesDeliveredAsync(IList<IBatchContainer> messages)
         {
             foreach (var message in messages.OfType<NatsBatchContainer>())
@@ -122,11 +83,6 @@ namespace Orleans.Streaming.NATS
             return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Shut down the receiver.
-        /// </summary>
-        /// <param name="timeout">Shutdown timeout.</param>
-        /// <returns>The task that shuts down the receiver.</returns>
         public Task Shutdown(TimeSpan timeout)
         {
             if (this.subscription != null)
