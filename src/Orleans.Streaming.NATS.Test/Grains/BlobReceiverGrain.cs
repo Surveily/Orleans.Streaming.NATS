@@ -10,8 +10,15 @@ namespace Orleans.Streaming.NATS.Test.Grains
     [ImplicitStreamSubscription("BlobStream")]
     public class BlobReceiverGrain : Grain, IBlobReceiverGrain
     {
+        private readonly IProcessor processor;
+
         private object? subscription;
         private IAsyncStream<BlobMessage>? input;
+
+        public BlobReceiverGrain(IProcessor processor)
+        {
+            this.processor = processor;
+        }
 
         public override async Task OnActivateAsync()
         {
@@ -25,7 +32,7 @@ namespace Orleans.Streaming.NATS.Test.Grains
 
         private Task OnNextAsync(BlobMessage message, StreamSequenceToken token)
         {
-            Console.WriteLine(message.Data.Value.Length);
+            this.processor.Process(message.Data.Value);
 
             return Task.CompletedTask;
         }

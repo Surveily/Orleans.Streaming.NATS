@@ -4,9 +4,11 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NUnit.Framework;
 using Orleans.Hosting;
 using Orleans.Streaming.NATS.Test.Grains;
+using Orleans.Streaming.NATS.Test.Messages;
 
 namespace Orleans.Streaming.NATS.Test.Scenarios
 {
@@ -15,10 +17,11 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
         public class Config : BaseGrainTestConfig, IDisposable
         {
             private bool isDisposed;
+            private Mock<IProcessor> processor = new Mock<IProcessor>();
 
             public override void Configure(HostBuilderContext host, IServiceCollection services)
             {
-                /* dependency injection code here */
+                services.AddSingleton(this.processor);
             }
 
             public override void Configure(HostBuilderContext host, IConfigurationBuilder configuration)
@@ -46,35 +49,51 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
             }
         }
 
-        public class When_Sending_Simple_Message_One_To_One : BaseGrainTest<Config>
+        public abstract class BaseOneToOneTest : BaseGrainTest<Config>
         {
+            protected Mock<IProcessor>? Processor { get; set; }
+
             public override void Prepare()
             {
+                this.Processor = this.Container.GetService<Mock<IProcessor>>();
+
                 base.Prepare();
-            }
-
-            [Test]
-            public override async Task Act()
-            {
-                var grain = this.Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
-
-                await grain.SendAsync("text");
             }
         }
 
-        public class When_Sending_Blob_Message_One_To_One : BaseGrainTest<Config>
+        public class When_Sending_Simple_Message_One_To_One : BaseOneToOneTest
         {
-            public override void Prepare()
-            {
-                base.Prepare();
-            }
+            private string expected = "text";
 
-            [Test]
             public override async Task Act()
             {
                 var grain = this.Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
 
-                await grain.SendAsync(new byte[1024]);
+                await grain.SendAsync(this.expected);
+            }
+
+            [Test]
+            public void It_Should_Deliver_Text()
+            {
+                this.Processor!.Verify(x => x.Process(this.expected), Times.Once);
+            }
+        }
+
+        public class When_Sending_Blob_Message_One_To_One : BaseOneToOneTest
+        {
+            private byte[] expected = new byte[1024];
+
+            public override async Task Act()
+            {
+                var grain = this.Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
+
+                await grain.SendAsync(this.expected);
+            }
+
+            [Test]
+            public void It_Should_Deliver_Data()
+            {
+                this.Processor!.Verify(x => x.Process(this.expected), Times.Once);
             }
         }
     }

@@ -10,8 +10,15 @@ namespace Orleans.Streaming.NATS.Test.Grains
     [ImplicitStreamSubscription("SimpleStream")]
     public class SimpleReceiverGrain : Grain, ISimpleReceiverGrain
     {
+        private readonly IProcessor processor;
+
         private object? subscription;
         private IAsyncStream<SimpleMessage>? input;
+
+        public SimpleReceiverGrain(IProcessor processor)
+        {
+            this.processor = processor;
+        }
 
         public override async Task OnActivateAsync()
         {
@@ -25,7 +32,7 @@ namespace Orleans.Streaming.NATS.Test.Grains
 
         private Task OnNextAsync(SimpleMessage message, StreamSequenceToken token)
         {
-            Console.WriteLine(message.Text.Value);
+            this.processor.Process(message.Text.Value);
 
             return Task.CompletedTask;
         }
