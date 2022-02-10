@@ -64,13 +64,24 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
 
         public class When_Sending_Simple_Message_One_To_One : BaseOneToOneTest
         {
+            private string result;
             private string expected = "text";
+
+            public override void Prepare()
+            {
+                base.Prepare();
+
+                this.Processor!.Setup(x => x.Process(It.IsAny<string>()))
+                               .Callback<string>(x => this.result = x);
+            }
 
             public override async Task Act()
             {
                 var grain = this.Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
 
                 await grain.SendAsync(this.expected);
+
+                await this.WaitFor(() => this.result);
             }
 
             [Test]
@@ -82,13 +93,24 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
 
         public class When_Sending_Blob_Message_One_To_One : BaseOneToOneTest
         {
+            private byte[] result;
             private byte[] expected = new byte[1024];
+
+            public override void Prepare()
+            {
+                base.Prepare();
+
+                this.Processor!.Setup(x => x.Process(It.IsAny<byte[]>()))
+                               .Callback<byte[]>(x => this.result = x);
+            }
 
             public override async Task Act()
             {
                 var grain = this.Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
 
                 await grain.SendAsync(this.expected);
+
+                await this.WaitFor(() => this.result);
             }
 
             [Test]
