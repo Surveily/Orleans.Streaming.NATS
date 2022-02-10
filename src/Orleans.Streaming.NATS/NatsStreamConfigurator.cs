@@ -19,14 +19,14 @@ namespace Orleans.Streaming.NATS
             configureAppPartsDelegate(parts =>
             {
                 parts.AddFrameworkPart(typeof(NatsQueueAdapterFactory).Assembly)
-                    .AddFrameworkPart(typeof(EventSequenceTokenV2).Assembly);
+                     .AddFrameworkPart(typeof(EventSequenceTokenV2).Assembly);
             });
 
             this.ConfigureDelegate(services =>
             {
                 services.ConfigureNamedOptionForLogging<NatsQueueOptions>(name)
-                    .ConfigureNamedOptionForLogging<SimpleQueueCacheOptions>(name)
-                    .ConfigureNamedOptionForLogging<HashRingStreamQueueMapperOptions>(name);
+                        .ConfigureNamedOptionForLogging<SimpleQueueCacheOptions>(name)
+                        .ConfigureNamedOptionForLogging<HashRingStreamQueueMapperOptions>(name);
             });
         }
 
@@ -54,17 +54,16 @@ namespace Orleans.Streaming.NATS
         public ClusterClientNatsConfigurator(string name, IClientBuilder builder)
             : base(name, builder, NatsQueueAdapterFactory.Create)
         {
-            builder
-                .ConfigureApplicationParts(parts =>
-                {
-                    parts.AddFrameworkPart(typeof(NatsQueueAdapterFactory).Assembly)
-                        .AddFrameworkPart(typeof(EventSequenceTokenV2).Assembly);
-                })
-                .ConfigureServices(services =>
-                {
-                    services.ConfigureNamedOptionForLogging<NatsQueueOptions>(name)
-                    .ConfigureNamedOptionForLogging<HashRingStreamQueueMapperOptions>(name);
-                });
+            builder.ConfigureApplicationParts(parts =>
+                   {
+                       parts.AddFrameworkPart(typeof(NatsQueueAdapterFactory).Assembly)
+                            .AddFrameworkPart(typeof(EventSequenceTokenV2).Assembly);
+                   })
+                   .ConfigureServices(services =>
+                   {
+                       services.ConfigureNamedOptionForLogging<NatsQueueOptions>(name)
+                               .ConfigureNamedOptionForLogging<HashRingStreamQueueMapperOptions>(name);
+                   });
         }
 
         public ClusterClientNatsConfigurator ConfigureSqs(Action<OptionsBuilder<NatsQueueOptions>> configureOptions)
