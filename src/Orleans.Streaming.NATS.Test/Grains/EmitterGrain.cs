@@ -18,8 +18,10 @@ namespace Orleans.Streaming.NATS.Test.Grains
             var key = this.GetPrimaryKeyString().Split('/');
             var streamProvider = this.GetStreamProvider("Default");
 
-            this.blobStream = streamProvider.GetStream<BlobMessage>(Guid.Parse(key[1]), "BlobStream");
-            this.simpleStream = streamProvider.GetStream<SimpleMessage>(Guid.Parse(key[1]), "SimpleStream");
+            var id = Guid.Parse(key[1]);
+
+            this.blobStream = streamProvider.GetStream<BlobMessage>(id, nameof(BlobMessage));
+            this.simpleStream = streamProvider.GetStream<SimpleMessage>(id, nameof(SimpleMessage));
 
             await base.OnActivateAsync();
         }

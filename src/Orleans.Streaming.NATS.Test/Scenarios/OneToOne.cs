@@ -22,6 +22,7 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
             public override void Configure(HostBuilderContext host, IServiceCollection services)
             {
                 services.AddSingleton(this.processor);
+                services.AddSingleton(this.processor.Object);
             }
 
             public override void Configure(HostBuilderContext host, IConfigurationBuilder configuration)

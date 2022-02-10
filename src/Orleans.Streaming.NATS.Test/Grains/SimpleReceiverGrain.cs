@@ -7,7 +7,7 @@ using Orleans.Streams;
 
 namespace Orleans.Streaming.NATS.Test.Grains
 {
-    [ImplicitStreamSubscription("SimpleStream")]
+    [ImplicitStreamSubscription(nameof(SimpleMessage))]
     public class SimpleReceiverGrain : Grain, ISimpleReceiverGrain
     {
         private readonly IProcessor processor;
@@ -24,7 +24,7 @@ namespace Orleans.Streaming.NATS.Test.Grains
         {
             var streamProvider = this.GetStreamProvider("Default");
 
-            this.input = streamProvider.GetStream<SimpleMessage>(this.GetPrimaryKey(), "SimpleStream");
+            this.input = streamProvider.GetStream<SimpleMessage>(this.GetPrimaryKey(), nameof(SimpleMessage));
             this.subscription = await this.input.SubscribeAsync<SimpleMessage>(this.OnNextAsync);
 
             await base.OnActivateAsync();

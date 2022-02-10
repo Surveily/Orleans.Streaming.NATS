@@ -7,7 +7,7 @@ using Orleans.Streams;
 
 namespace Orleans.Streaming.NATS.Test.Grains
 {
-    [ImplicitStreamSubscription("BlobStream")]
+    [ImplicitStreamSubscription(nameof(BlobMessage))]
     public class BlobReceiverGrain : Grain, IBlobReceiverGrain
     {
         private readonly IProcessor processor;
@@ -24,7 +24,7 @@ namespace Orleans.Streaming.NATS.Test.Grains
         {
             var streamProvider = this.GetStreamProvider("Default");
 
-            this.input = streamProvider.GetStream<BlobMessage>(this.GetPrimaryKey(), "BlobStream");
+            this.input = streamProvider.GetStream<BlobMessage>(this.GetPrimaryKey(), nameof(BlobMessage));
             this.subscription = await this.input.SubscribeAsync<BlobMessage>(this.OnNextAsync);
 
             await base.OnActivateAsync();
