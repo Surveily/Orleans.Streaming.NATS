@@ -3,6 +3,7 @@
 // </copyright>
 
 using NATS.Client.JetStream;
+using Orleans.Serialization;
 using Orleans.Streams;
 
 namespace Orleans.Streaming.NATS
@@ -13,17 +14,57 @@ namespace Orleans.Streaming.NATS
     public class NatsQueueAdapterReceiver : IQueueAdapterReceiver
     {
         /// <summary>
+        /// Stream name.
+        /// </summary>
+        private readonly string stream;
+
+        /// <summary>
         /// Connection object.
         /// </summary>
         private readonly IJetStream jetStream;
 
         /// <summary>
+        /// Serialization manager object.
+        /// </summary>
+        private readonly SerializationManager serializationManager;
+
+        /// <summary>
+        /// Timeout object.
+        /// </summary>
+        private TimeSpan timeout;
+
+        /// <summary>
+        /// Counter for read messages.
+        /// </summary>
+        private long lastReadMessage;
+
+        /// <summary>
+        /// Subscription object.
+        /// </summary>
+        private IJetStreamPullSubscription? subscription;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NatsQueueAdapterReceiver"/> class.
         /// </summary>
+        /// <param name="serializationManager">Serialization manager object.</param>
         /// <param name="jetStream">Connection object.</param>
-        public NatsQueueAdapterReceiver(IJetStream jetStream)
+        /// <param name="stream">Stream name.</param>
+        public NatsQueueAdapterReceiver(SerializationManager serializationManager, IJetStream jetStream, string stream)
         {
+            if (stream == null)
+            {
+                throw new ArgumentException(nameof(stream));
+            }
+
+            if (jetStream == null)
+            {
+                throw new ArgumentException(nameof(jetStream));
+            }
+
+            this.stream = stream;
             this.jetStream = jetStream;
+            this.timeout = TimeSpan.FromSeconds(1);
+            this.serializationManager = serializationManager;
         }
 
         /// <summary>
@@ -33,7 +74,15 @@ namespace Orleans.Streaming.NATS
         /// <returns>List of messages.</returns>
         public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
         {
-            throw new NotImplementedException();
+            var result = new List<IBatchContainer>();
+            var fetched = this.subscription!.Fetch(maxCount, (int)this.timeout.TotalMilliseconds);
+
+            foreach (var message in fetched)
+            {
+                NatsBatchContainer.FromNatsMessage(this.serializationManager, message, this.lastReadMessage++);
+            }
+
+            return Task.FromResult(result as IList<IBatchContainer>);
         }
 
         /// <summary>
@@ -43,7 +92,15 @@ namespace Orleans.Streaming.NATS
         /// <returns>The task that creates the receiver.</returns>
         public Task Initialize(TimeSpan timeout)
         {
-            throw new NotImplementedException();
+            var cc = Nats.GetConsumer(this.stream);
+            var options = PullSubscribeOptions.Builder()
+                                              .WithConfiguration(cc)
+                                              .Build();
+
+            this.timeout = timeout;
+            this.subscription = this.jetStream.PullSubscribe($"{this.stream}.request", options);
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -53,7 +110,16 @@ namespace Orleans.Streaming.NATS
         /// <returns>The task that acknowledges the messages.</returns>
         public Task MessagesDeliveredAsync(IList<IBatchContainer> messages)
         {
-            throw new NotImplementedException();
+            foreach (var message in messages.OfType<NatsBatchContainer>())
+            {
+                if (message.Message != null)
+                {
+                    message.Message.Ack();
+                    message.Message = null;
+                }
+            }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -63,7 +129,12 @@ namespace Orleans.Streaming.NATS
         /// <returns>The task that shuts down the receiver.</returns>
         public Task Shutdown(TimeSpan timeout)
         {
-            throw new NotImplementedException();
+            if (this.subscription != null)
+            {
+                this.subscription.Dispose();
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

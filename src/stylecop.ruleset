@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Surveily Style Guide" Description="Making sure the code is readable." ToolsVersion="15.0">
+    <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+        <Rule Id="SA0001" Action="None" />
+        <Rule Id="SA1401" Action="None" />
+    </Rules>
+</RuleSet>

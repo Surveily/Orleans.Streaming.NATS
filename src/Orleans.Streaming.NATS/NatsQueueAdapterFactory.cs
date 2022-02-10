@@ -2,7 +2,12 @@
 // Copyright (c) Surveily Sp. z o.o.. All rights reserved.
 // </copyright>
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NATS.Client.JetStream;
+using Orleans.Configuration;
+using Orleans.Providers.Streams.Common;
+using Orleans.Serialization;
 using Orleans.Streams;
 
 namespace Orleans.Streaming.NATS
@@ -12,18 +17,77 @@ namespace Orleans.Streaming.NATS
     /// </summary>
     public class NatsQueueAdapterFactory : IQueueAdapterFactory
     {
+        private readonly string name;
+
         /// <summary>
         /// Connection object.
         /// </summary>
         private readonly IJetStream jetStream;
 
         /// <summary>
+        /// Storage type.
+        /// </summary>
+        private readonly StorageType storageType;
+
+        /// <summary>
+        /// Logger factory object.
+        /// </summary>
+        private readonly ILoggerFactory loggerFactory;
+
+        /// <summary>
+        /// Adapter cache object.
+        /// </summary>
+        private readonly IQueueAdapterCache adapterCache;
+
+        /// <summary>
+        /// Service provider object.
+        /// </summary>
+        private readonly IServiceProvider serviceProvider;
+
+        /// <summary>
+        /// Cache options.
+        /// </summary>
+        private readonly SimpleQueueCacheOptions cacheOptions;
+
+        /// <summary>
+        /// Cluster options.
+        /// </summary>
+        private readonly IOptions<ClusterOptions> clusterOptions;
+
+        /// <summary>
+        /// Serialization manager object.
+        /// </summary>
+        private readonly SerializationManager serializationManager;
+
+        /// <summary>
+        /// Queue mapper options.
+        /// </summary>
+        private readonly HashRingBasedStreamQueueMapper streamQueueMapper;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="NatsQueueAdapterFactory"/> class.
         /// </summary>
+        /// <param name="name">Name.</param>
         /// <param name="jetStream">Connection object.</param>
-        public NatsQueueAdapterFactory(IJetStream jetStream)
+        /// <param name="queueMapperOptions">Queue mapper options.</param>
+        /// <param name="cacheOptions">Cache options.</param>
+        /// <param name="serviceProvider">Service provider object.</param>
+        /// <param name="clusterOptions">Cluster options.</param>
+        /// <param name="serializationManager">Serialization manager object.</param>
+        /// <param name="loggerFactory">Logger factory object.</param>
+        /// <param name="storageType">Storage type.</param>
+        public NatsQueueAdapterFactory(string name, IJetStream jetStream, HashRingStreamQueueMapperOptions queueMapperOptions, SimpleQueueCacheOptions cacheOptions, IServiceProvider serviceProvider, IOptions<ClusterOptions> clusterOptions, SerializationManager serializationManager, ILoggerFactory loggerFactory, StorageType storageType)
         {
+            this.name = name;
             this.jetStream = jetStream;
+            this.storageType = storageType;
+            this.cacheOptions = cacheOptions;
+            this.loggerFactory = loggerFactory;
+            this.clusterOptions = clusterOptions;
+            this.serviceProvider = serviceProvider;
+            this.serializationManager = serializationManager;
+            this.streamQueueMapper = new HashRingBasedStreamQueueMapper(queueMapperOptions, this.name);
+            this.adapterCache = new SimpleQueueAdapterCache(cacheOptions, this.name, this.loggerFactory);
         }
 
         /// <summary>
@@ -32,7 +96,9 @@ namespace Orleans.Streaming.NATS
         /// <returns>An adapter.</returns>
         public Task<IQueueAdapter> CreateAdapter()
         {
-            throw new NotImplementedException();
+            var adapter = new NatsQueueAdapter(this.serializationManager, this.streamQueueMapper, this.loggerFactory, this.jetStream);
+
+            return Task.FromResult<IQueueAdapter>(adapter);
         }
 
         /// <summary>
@@ -42,7 +108,7 @@ namespace Orleans.Streaming.NATS
         /// <returns>The object that handles failures.</returns>
         public Task<IStreamFailureHandler> GetDeliveryFailureHandler(QueueId queueId)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IStreamFailureHandler>(new NoOpStreamDeliveryFailureHandler());
         }
 
         /// <summary>
@@ -51,7 +117,7 @@ namespace Orleans.Streaming.NATS
         /// <returns>The cache of adapters.</returns>
         public IQueueAdapterCache GetQueueAdapterCache()
         {
-            throw new NotImplementedException();
+            return this.adapterCache;
         }
 
         /// <summary>
@@ -60,7 +126,7 @@ namespace Orleans.Streaming.NATS
         /// <returns>The stream queue mapper.</returns>
         public IStreamQueueMapper GetStreamQueueMapper()
         {
-            throw new NotImplementedException();
+            return this.streamQueueMapper;
         }
     }
 }

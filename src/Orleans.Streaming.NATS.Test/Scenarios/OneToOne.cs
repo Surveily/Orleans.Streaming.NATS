@@ -64,7 +64,7 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
 
         public class When_Sending_Simple_Message_One_To_One : BaseOneToOneTest
         {
-            private string result;
+            private string result = "empty";
             private string expected = "text";
 
             public override void Prepare()
@@ -93,7 +93,7 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
 
         public class When_Sending_Blob_Message_One_To_One : BaseOneToOneTest
         {
-            private byte[] result;
+            private byte[] result = new byte[0];
             private byte[] expected = new byte[1024];
 
             public override void Prepare()
