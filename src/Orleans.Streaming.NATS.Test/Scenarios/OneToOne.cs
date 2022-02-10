@@ -61,5 +61,21 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
                 await grain.SendAsync("text");
             }
         }
+
+        public class When_Sending_Blob_Message_One_To_One : BaseGrainTest<Config>
+        {
+            public override void Prepare()
+            {
+                base.Prepare();
+            }
+
+            [Test]
+            public override async Task Act()
+            {
+                var grain = this.Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
+
+                await grain.SendAsync(new byte[1024]);
+            }
+        }
     }
 }
