@@ -18,9 +18,9 @@ namespace Orleans.Streaming.NATS.Test
     {
         protected string Id => $"{Guid.NewGuid()}";
 
-        public abstract void Configure(Hosting.HostBuilderContext host, IServiceCollection services);
+        public abstract void Configure(HostBuilderContext host, IServiceCollection services);
 
-        public abstract void Configure(Hosting.HostBuilderContext host, IConfigurationBuilder configuration);
+        public abstract void Configure(HostBuilderContext host, IConfigurationBuilder configuration);
 
         public void Configure(ISiloHostBuilder hostBuilder)
         {

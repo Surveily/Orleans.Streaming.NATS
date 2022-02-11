@@ -4,7 +4,7 @@
 
 using Orleans.Hosting;
 
-namespace Orleans.Streaming.NATS
+namespace Orleans.Streaming.NATS.Hosting
 {
     public static class SiloBuilderExtensions
     {
@@ -20,18 +20,18 @@ namespace Orleans.Streaming.NATS
             return builder;
         }
 
-        public static ISiloBuilder AddNatsStreams(this ISiloBuilder builder, string name, Action<NatsStreamConfigurator> configure)
+        public static ISiloBuilder AddNatsStreams(this ISiloBuilder builder, string name, Action<SiloNatsStreamConfigurator> configure)
         {
-            var configurator = new NatsStreamConfigurator(name,
+            var configurator = new SiloNatsStreamConfigurator(name,
                 configureServicesDelegate => builder.ConfigureServices(configureServicesDelegate),
                 configureAppPartsDelegate => builder.ConfigureApplicationParts(configureAppPartsDelegate));
             configure?.Invoke(configurator);
             return builder;
         }
 
-        public static ISiloHostBuilder AddNatsStreams(this ISiloHostBuilder builder, string name, Action<NatsStreamConfigurator> configure)
+        public static ISiloHostBuilder AddNatsStreams(this ISiloHostBuilder builder, string name, Action<SiloNatsStreamConfigurator> configure)
         {
-            var configurator = new NatsStreamConfigurator(name,
+            var configurator = new SiloNatsStreamConfigurator(name,
                 configureServicesDelegate => builder.ConfigureServices(configureServicesDelegate),
                 configureAppPartsDelegate => builder.ConfigureApplicationParts(configureAppPartsDelegate));
             configure?.Invoke(configurator);

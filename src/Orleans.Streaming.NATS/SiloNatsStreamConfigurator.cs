@@ -1,4 +1,4 @@
-// <copyright file="NatsStreamConfigurator.cs" company="Surveily Sp. z o.o.">
+// <copyright file="SiloNatsStreamConfigurator.cs" company="Surveily Sp. z o.o.">
 // Copyright (c) Surveily Sp. z o.o.. All rights reserved.
 // </copyright>
 
@@ -11,9 +11,9 @@ using Orleans.Providers.Streams.Common;
 
 namespace Orleans.Streaming.NATS
 {
-    public class NatsStreamConfigurator : SiloPersistentStreamConfigurator
+    public class SiloNatsStreamConfigurator : SiloPersistentStreamConfigurator
     {
-        public NatsStreamConfigurator(string name, Action<Action<IServiceCollection>> configureServicesDelegate, Action<Action<IApplicationPartManager>> configureAppPartsDelegate)
+        public SiloNatsStreamConfigurator(string name, Action<Action<IServiceCollection>> configureServicesDelegate, Action<Action<IApplicationPartManager>> configureAppPartsDelegate)
             : base(name, configureServicesDelegate, NatsQueueAdapterFactory.Create)
         {
             configureAppPartsDelegate(parts =>
@@ -30,28 +30,28 @@ namespace Orleans.Streaming.NATS
             });
         }
 
-        public NatsStreamConfigurator ConfigureNats(Action<OptionsBuilder<NatsOptions>> configureOptions)
+        public SiloNatsStreamConfigurator ConfigureNats(Action<OptionsBuilder<NatsOptions>> configureOptions)
         {
             this.Configure(configureOptions);
             return this;
         }
 
-        public NatsStreamConfigurator ConfigureCache(int cacheSize = SimpleQueueCacheOptions.DEFAULT_CACHE_SIZE)
+        public SiloNatsStreamConfigurator ConfigureCache(int cacheSize = SimpleQueueCacheOptions.DEFAULT_CACHE_SIZE)
         {
             this.Configure<SimpleQueueCacheOptions>(ob => ob.Configure(options => options.CacheSize = cacheSize));
             return this;
         }
 
-        public NatsStreamConfigurator ConfigurePartitioning(int numOfparitions = HashRingStreamQueueMapperOptions.DEFAULT_NUM_QUEUES)
+        public SiloNatsStreamConfigurator ConfigurePartitioning(int numOfparitions = HashRingStreamQueueMapperOptions.DEFAULT_NUM_QUEUES)
         {
             this.Configure<HashRingStreamQueueMapperOptions>(ob => ob.Configure(options => options.TotalQueueCount = numOfparitions));
             return this;
         }
     }
 
-    public class ClusterClientNatsConfigurator : ClusterClientPersistentStreamConfigurator
+    public class ClusterClientNatsStreamConfigurator : ClusterClientPersistentStreamConfigurator
     {
-        public ClusterClientNatsConfigurator(string name, IClientBuilder builder)
+        public ClusterClientNatsStreamConfigurator(string name, IClientBuilder builder)
             : base(name, builder, NatsQueueAdapterFactory.Create)
         {
             builder.ConfigureApplicationParts(parts =>
@@ -66,13 +66,13 @@ namespace Orleans.Streaming.NATS
                    });
         }
 
-        public ClusterClientNatsConfigurator ConfigureNats(Action<OptionsBuilder<NatsOptions>> configureOptions)
+        public ClusterClientNatsStreamConfigurator ConfigureNats(Action<OptionsBuilder<NatsOptions>> configureOptions)
         {
             this.Configure(configureOptions);
             return this;
         }
 
-        public ClusterClientNatsConfigurator ConfigurePartitioning(int numOfparitions = HashRingStreamQueueMapperOptions.DEFAULT_NUM_QUEUES)
+        public ClusterClientNatsStreamConfigurator ConfigurePartitioning(int numOfparitions = HashRingStreamQueueMapperOptions.DEFAULT_NUM_QUEUES)
         {
             this.Configure<HashRingStreamQueueMapperOptions>(ob => ob.Configure(options => options.TotalQueueCount = numOfparitions));
             return this;

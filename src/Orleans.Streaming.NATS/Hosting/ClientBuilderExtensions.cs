@@ -2,7 +2,7 @@
 // Copyright (c) Surveily Sp. z o.o.. All rights reserved.
 // </copyright>
 
-namespace Orleans.Streaming.NATS
+namespace Orleans.Streaming.NATS.Hosting
 {
     public static class ClientBuilderExtensions
     {
@@ -12,9 +12,9 @@ namespace Orleans.Streaming.NATS
             return builder;
         }
 
-        public static IClientBuilder AddNatsStreams(this IClientBuilder builder, string name, Action<ClusterClientNatsConfigurator> configure)
+        public static IClientBuilder AddNatsStreams(this IClientBuilder builder, string name, Action<ClusterClientNatsStreamConfigurator> configure)
         {
-            var configurator = new ClusterClientNatsConfigurator(name, builder);
+            var configurator = new ClusterClientNatsStreamConfigurator(name, builder);
             configure?.Invoke(configurator);
             return builder;
         }
