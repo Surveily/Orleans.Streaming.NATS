@@ -43,12 +43,14 @@ namespace Orleans.Streaming.NATS.Streams
 
         public async Task QueueMessageBatchAsync<T>(Guid streamGuid, string streamNamespace, IEnumerable<T> events, StreamSequenceToken token, Dictionary<string, object> requestContext)
         {
+            var queueId = this.streamQueueMapper.GetQueueForStream(streamGuid, streamNamespace);
+            var message = NatsBatchContainer.ToMessage(this.serializationManager, streamGuid, streamNamespace, events, requestContext);
             var builder = PublishOptions.Builder()
                                         .WithTimeout(1000)
                                         .WithStream(streamNamespace)
                                         .WithMessageId(Guid.NewGuid().ToString());
 
-            var ack = await this.jetStream.PublishAsync($"{streamNamespace}.request", null, builder.Build());
+            var ack = await this.jetStream.PublishAsync($"{queueId}.request", message.Data, builder.Build());
         }
     }
 }

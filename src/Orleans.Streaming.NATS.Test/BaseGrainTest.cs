@@ -31,6 +31,7 @@ namespace Orleans.Streaming.NATS.Test
 
             for (var i = 0; i < QueueNumber; i++)
             {
+                Nats.Delete(jetStream, $"default-{i}");
                 Nats.Prepare(jetStream, $"default-{i}", StorageType.Memory);
             }
 

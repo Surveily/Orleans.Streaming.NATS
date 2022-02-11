@@ -90,5 +90,32 @@ namespace Orleans.Streaming.NATS
                 management.AddOrUpdateConsumer(stream, cc);
             }
         }
+
+        /// <summary>
+        /// Delete a stream in NATS.
+        /// </summary>
+        /// <param name="management">JetStream management context.</param>
+        /// <param name="stream">Stream name.</param>
+        public static void Delete(IJetStreamManagement management, string stream)
+        {
+            StreamInfo? streamInfo = null;
+
+            try
+            {
+                streamInfo = management.GetStreamInfo(stream);
+            }
+            catch (NATSJetStreamException ex)
+            {
+                if (ex.ErrorCode != 404)
+                {
+                    throw;
+                }
+            }
+
+            if (streamInfo != null)
+            {
+                management.DeleteStream(stream);
+            }
+        }
     }
 }

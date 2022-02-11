@@ -45,8 +45,13 @@ namespace Orleans.Streaming.NATS.Streams
 
         public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
         {
+            const int MaxNumberOfMessagesToPeek = 256;
+
+            int count = maxCount < 0 || maxCount == QueueAdapterConstants.UNLIMITED_GET_QUEUE_MSG ?
+                   MaxNumberOfMessagesToPeek : Math.Min(maxCount, MaxNumberOfMessagesToPeek);
+
             var result = new List<IBatchContainer>();
-            var fetched = this.subscription!.Fetch(maxCount, (int)this.timeout.TotalMilliseconds);
+            var fetched = this.subscription!.Fetch(count, (int)this.timeout.TotalMilliseconds);
 
             foreach (var message in fetched)
             {
