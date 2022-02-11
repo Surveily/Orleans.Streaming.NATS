@@ -11,7 +11,5 @@ namespace Orleans.Streaming.NATS.Streams
         [Redact]
         public string? ConnectionString { get; set; }
 
-        [Redact]
-        public StorageType StorageType { get; set; }
     }
 }

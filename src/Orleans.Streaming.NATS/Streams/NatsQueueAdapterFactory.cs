@@ -24,8 +24,6 @@ namespace Orleans.Streaming.NATS.Streams
 
         private readonly IJetStream jetStream;
 
-        private readonly StorageType storageType;
-
         private readonly ILoggerFactory loggerFactory;
 
         private readonly IQueueAdapterCache adapterCache;
@@ -40,11 +38,10 @@ namespace Orleans.Streaming.NATS.Streams
 
         private readonly HashRingBasedStreamQueueMapper streamQueueMapper;
 
-        public NatsQueueAdapterFactory(string name, IJetStream jetStream, HashRingStreamQueueMapperOptions queueMapperOptions, SimpleQueueCacheOptions cacheOptions, IServiceProvider serviceProvider, IOptions<ClusterOptions> clusterOptions, SerializationManager serializationManager, ILoggerFactory loggerFactory, StorageType storageType)
+        public NatsQueueAdapterFactory(string name, IJetStream jetStream, HashRingStreamQueueMapperOptions queueMapperOptions, SimpleQueueCacheOptions cacheOptions, IServiceProvider serviceProvider, IOptions<ClusterOptions> clusterOptions, SerializationManager serializationManager, ILoggerFactory loggerFactory)
         {
             this.name = name;
             this.jetStream = jetStream;
-            this.storageType = storageType;
             this.cacheOptions = cacheOptions;
             this.loggerFactory = loggerFactory;
             this.clusterOptions = clusterOptions;
@@ -62,10 +59,10 @@ namespace Orleans.Streaming.NATS.Streams
             var queueMapperOptions = services.GetOptionsByName<HashRingStreamQueueMapperOptions>(name);
 
             var cf = new ConnectionFactory();
-            var qr = cf.CreateConnection("nats://nats:4222");
+            var qr = cf.CreateConnection(natsOptions.ConnectionString);
             var jetStream = qr.CreateJetStreamContext();
 
-            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, jetStream, queueMapperOptions, cacheOptions, services, clusterOptions, natsOptions!.StorageType);
+            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, jetStream, queueMapperOptions, cacheOptions, services, clusterOptions);
         }
 
         public Task<IQueueAdapter> CreateAdapter()

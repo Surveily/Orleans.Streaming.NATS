@@ -3,6 +3,8 @@
 // </copyright>
 
 using System.Diagnostics;
+using NATS.Client;
+using NATS.Client.JetStream;
 using NUnit.Framework;
 using Orleans.Runtime;
 using Orleans.TestingHost;
@@ -15,11 +17,23 @@ namespace Orleans.Streaming.NATS.Test
     public abstract class BaseGrainTest<T>
        where T : ISiloBuilderConfigurator, IClientBuilderConfigurator, new()
     {
+        public const int QueueNumber = 8;
+        public const string NatsConnection = "nats://nats:4222";
+
         private readonly AsyncRetryPolicy retryPolicy;
 
 #pragma warning disable CS8618
         public BaseGrainTest()
         {
+            var factory = new ConnectionFactory();
+            var conection = factory.CreateConnection(NatsConnection);
+            var jetStream = conection.CreateJetStreamManagementContext();
+
+            for (var i = 0; i < QueueNumber; i++)
+            {
+                Nats.Prepare(jetStream, $"default-{i}", StorageType.Memory);
+            }
+
             var builder = new TestClusterBuilder(1);
 
             builder.AddSiloBuilderConfigurator<T>();

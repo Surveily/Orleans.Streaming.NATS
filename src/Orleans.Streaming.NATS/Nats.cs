@@ -39,5 +39,56 @@ namespace Orleans.Streaming.NATS
                                         .WithFilterSubject($"{stream}.request")
                                         .Build();
         }
+
+        /// <summary>
+        /// Create a stream in NATS.
+        /// </summary>
+        /// <param name="management">JetStream management context.</param>
+        /// <param name="stream">Stream name.</param>
+        /// <param name="storageType">Stream storage type.</param>
+        public static void Prepare(IJetStreamManagement management, string stream, StorageType storageType)
+        {
+            StreamInfo? streamInfo = null;
+
+            try
+            {
+                streamInfo = management.GetStreamInfo(stream);
+            }
+            catch (NATSJetStreamException ex)
+            {
+                if (ex.ErrorCode != 404)
+                {
+                    throw;
+                }
+            }
+
+            if (streamInfo == null)
+            {
+                var sc = GetStream(stream, storageType);
+
+                management.AddStream(sc);
+            }
+
+            ConsumerInfo? consumerInfo = null;
+
+            try
+            {
+                consumerInfo = management.GetConsumerInfo(stream, $"{stream}");
+            }
+            catch (NATSJetStreamException)
+            {
+                if (ex.ErrorCode != 404)
+                {
+                    throw;
+                }
+            }
+
+            if (consumerInfo == null)
+            {
+                var cc = GetConsumer(stream);
+
+                management.AddOrUpdateConsumer(stream, cc);
+            }
+        }
     }
 }

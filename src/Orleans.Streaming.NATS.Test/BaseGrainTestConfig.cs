@@ -5,12 +5,9 @@
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NATS.Client.JetStream;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.Providers;
 using Orleans.Streaming.NATS.Hosting;
-using Orleans.Streaming.NATS.Test.Grains;
 using Orleans.TestingHost;
 #pragma warning disable CS0618
 
@@ -46,7 +43,6 @@ namespace Orleans.Streaming.NATS.Test
                        .AddMemoryGrainStorage("PubSubStore")
                        .AddNatsStreams("Default", configureOptions: options =>
                        {
-                           options.StorageType = StorageType.Memory;
                            options.ConnectionString = "nats://nats:4222";
                        });
             /* .AddMemoryStreams<DefaultMemoryMessageBodySerializer>("Default"); */
@@ -65,7 +61,6 @@ namespace Orleans.Streaming.NATS.Test
                          })
                          .AddNatsStreams("Default", configureOptions: options =>
                          {
-                             options.StorageType = StorageType.Memory;
                              options.ConnectionString = "nats://nats:4222";
                          });
         }

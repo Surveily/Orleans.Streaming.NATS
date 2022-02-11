@@ -5,6 +5,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NATS.Client;
+using NATS.Client.JetStream;
 using NUnit.Framework;
 using Orleans.Hosting;
 using Orleans.Streaming.NATS.Test.Grains;
