@@ -24,13 +24,13 @@ namespace Orleans.Streaming.NATS
 
             this.ConfigureDelegate(services =>
             {
-                services.ConfigureNamedOptionForLogging<NatsQueueOptions>(name)
+                services.ConfigureNamedOptionForLogging<NatsOptions>(name)
                         .ConfigureNamedOptionForLogging<SimpleQueueCacheOptions>(name)
                         .ConfigureNamedOptionForLogging<HashRingStreamQueueMapperOptions>(name);
             });
         }
 
-        public NatsStreamConfigurator ConfigureNats(Action<OptionsBuilder<NatsQueueOptions>> configureOptions)
+        public NatsStreamConfigurator ConfigureNats(Action<OptionsBuilder<NatsOptions>> configureOptions)
         {
             this.Configure(configureOptions);
             return this;
@@ -61,12 +61,12 @@ namespace Orleans.Streaming.NATS
                    })
                    .ConfigureServices(services =>
                    {
-                       services.ConfigureNamedOptionForLogging<NatsQueueOptions>(name)
+                       services.ConfigureNamedOptionForLogging<NatsOptions>(name)
                                .ConfigureNamedOptionForLogging<HashRingStreamQueueMapperOptions>(name);
                    });
         }
 
-        public ClusterClientNatsConfigurator ConfigureNats(Action<OptionsBuilder<NatsQueueOptions>> configureOptions)
+        public ClusterClientNatsConfigurator ConfigureNats(Action<OptionsBuilder<NatsOptions>> configureOptions)
         {
             this.Configure(configureOptions);
             return this;
