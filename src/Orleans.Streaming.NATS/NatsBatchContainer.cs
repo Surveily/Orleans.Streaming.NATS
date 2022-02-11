@@ -100,8 +100,8 @@ namespace Orleans.Streaming.NATS
 
         internal static Msg ToMessage<T>(SerializationManager serializationManager, Guid streamGuid, string streamNamespace, IEnumerable<T> events, Dictionary<string, object> requestContext)
         {
-            var sqsBatchMessage = new NatsBatchContainer(streamGuid, streamNamespace, events.Cast<object>().ToList(), requestContext);
-            var rawBytes = serializationManager.SerializeToByteArray(sqsBatchMessage);
+            var batchMessage = new NatsBatchContainer(streamGuid, streamNamespace, events.Cast<object>().ToList(), requestContext);
+            var rawBytes = serializationManager.SerializeToByteArray(batchMessage);
             var payload = new JObject();
 
             payload.Add("payload", JToken.FromObject(rawBytes));
@@ -116,12 +116,12 @@ namespace Orleans.Streaming.NATS
 
             if (payload != null)
             {
-                var sqsBatch = serializationManager.DeserializeFromByteArray<NatsBatchContainer>(payload.ToObject<byte[]>());
+                var batch = serializationManager.DeserializeFromByteArray<NatsBatchContainer>(payload.ToObject<byte[]>());
 
-                sqsBatch.Message = msg;
-                sqsBatch.sequenceToken = new EventSequenceTokenV2(sequenceId);
+                batch.Message = msg;
+                batch.sequenceToken = new EventSequenceTokenV2(sequenceId);
 
-                return sqsBatch;
+                return batch;
             }
 
             throw new InvalidOperationException("Payload is null");

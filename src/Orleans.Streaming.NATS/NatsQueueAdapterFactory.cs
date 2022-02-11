@@ -56,11 +56,11 @@ namespace Orleans.Streaming.NATS
         public static NatsQueueAdapterFactory Create(IServiceProvider services, string name)
         {
             var clusterOptions = services.GetProviderClusterOptions(name);
-            var sqsOptions = services.GetOptionsByName<NatsQueueOptions>(name);
+            var natsOptions = services.GetOptionsByName<NatsQueueOptions>(name);
             var cacheOptions = services.GetOptionsByName<SimpleQueueCacheOptions>(name);
             var queueMapperOptions = services.GetOptionsByName<HashRingStreamQueueMapperOptions>(name);
 
-            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, sqsOptions, cacheOptions, queueMapperOptions, clusterOptions);
+            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, natsOptions, cacheOptions, queueMapperOptions, clusterOptions);
         }
 
         public Task<IQueueAdapter> CreateAdapter()

@@ -30,7 +30,7 @@ namespace Orleans.Streaming.NATS
             });
         }
 
-        public NatsStreamConfigurator ConfigureSqs(Action<OptionsBuilder<NatsQueueOptions>> configureOptions)
+        public NatsStreamConfigurator ConfigureNats(Action<OptionsBuilder<NatsQueueOptions>> configureOptions)
         {
             this.Configure(configureOptions);
             return this;
@@ -66,7 +66,7 @@ namespace Orleans.Streaming.NATS
                    });
         }
 
-        public ClusterClientNatsConfigurator ConfigureSqs(Action<OptionsBuilder<NatsQueueOptions>> configureOptions)
+        public ClusterClientNatsConfigurator ConfigureNats(Action<OptionsBuilder<NatsQueueOptions>> configureOptions)
         {
             this.Configure(configureOptions);
             return this;
