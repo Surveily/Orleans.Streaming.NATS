@@ -71,15 +71,18 @@ namespace Orleans.Streaming.NATS
 
             ConsumerInfo? consumerInfo = null;
 
-            try
+            if (streamInfo != null)
             {
-                consumerInfo = management.GetConsumerInfo(stream, $"{stream}");
-            }
-            catch (NATSJetStreamException ex)
-            {
-                if (ex.ErrorCode != 404)
+                try
                 {
-                    throw;
+                    consumerInfo = management.GetConsumerInfo(stream, $"{stream}");
+                }
+                catch (NATSJetStreamException ex)
+                {
+                    if (ex.ErrorCode != 404)
+                    {
+                        throw;
+                    }
                 }
             }
 

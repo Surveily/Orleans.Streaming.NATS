@@ -55,7 +55,7 @@ namespace Orleans.Streaming.NATS.Streams
 
             foreach (var message in fetched)
             {
-                NatsBatchContainer.FromNatsMessage(this.serializationManager, message, this.lastReadMessage++);
+                result.Add(NatsBatchContainer.FromNatsMessage(this.serializationManager, message, this.lastReadMessage++));
             }
 
             return Task.FromResult(result as IList<IBatchContainer>);

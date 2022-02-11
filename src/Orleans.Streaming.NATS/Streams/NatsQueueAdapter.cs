@@ -47,7 +47,7 @@ namespace Orleans.Streaming.NATS.Streams
             var message = NatsBatchContainer.ToMessage(this.serializationManager, streamGuid, streamNamespace, events, requestContext);
             var builder = PublishOptions.Builder()
                                         .WithTimeout(1000)
-                                        .WithStream(streamNamespace)
+                                        .WithStream(queueId.ToString())
                                         .WithMessageId(Guid.NewGuid().ToString());
 
             var ack = await this.jetStream.PublishAsync($"{queueId}.request", message.Data, builder.Build());
