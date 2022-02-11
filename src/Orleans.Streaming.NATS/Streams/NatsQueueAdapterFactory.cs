@@ -5,6 +5,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NATS.Client;
 using NATS.Client.JetStream;
 using Orleans.Configuration;
 using Orleans.Configuration.Overrides;
@@ -60,7 +61,11 @@ namespace Orleans.Streaming.NATS.Streams
             var cacheOptions = services.GetOptionsByName<SimpleQueueCacheOptions>(name);
             var queueMapperOptions = services.GetOptionsByName<HashRingStreamQueueMapperOptions>(name);
 
-            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, natsOptions, cacheOptions, queueMapperOptions, clusterOptions);
+            var cf = new ConnectionFactory();
+            var qr = cf.CreateConnection("nats://nats:4222");
+            var jetStream = qr.CreateJetStreamContext();
+
+            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, jetStream, queueMapperOptions, cacheOptions, services, clusterOptions, natsOptions.StorageType);
         }
 
         public Task<IQueueAdapter> CreateAdapter()

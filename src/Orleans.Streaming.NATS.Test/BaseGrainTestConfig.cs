@@ -5,9 +5,11 @@
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NATS.Client.JetStream;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers;
+using Orleans.Streaming.NATS.Hosting;
 using Orleans.Streaming.NATS.Test.Grains;
 using Orleans.TestingHost;
 #pragma warning disable CS0618
@@ -42,7 +44,12 @@ namespace Orleans.Streaming.NATS.Test
                        .ConfigureEndpoints(IPAddress.Parse("127.0.0.1"), 22222, 30000, listenOnAnyHostAddress: true)
                        .AddMemoryGrainStorageAsDefault()
                        .AddMemoryGrainStorage("PubSubStore")
-                       .AddMemoryStreams<DefaultMemoryMessageBodySerializer>("Default");
+                       .AddNatsStreams("Default", configureOptions: options =>
+                       {
+                           options.StorageType = StorageType.Memory;
+                           options.ConnectionString = "nats://nats:4222";
+                       });
+            /* .AddMemoryStreams<DefaultMemoryMessageBodySerializer>("Default"); */
         }
 
         public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
@@ -55,6 +62,11 @@ namespace Orleans.Streaming.NATS.Test
                          .Configure<ClientMessagingOptions>(options =>
                          {
                              options.LocalAddress = IPAddress.Parse("127.0.0.1");
+                         })
+                         .AddNatsStreams("Default", configureOptions: options =>
+                         {
+                             options.StorageType = StorageType.Memory;
+                             options.ConnectionString = "nats://nats:4222";
                          });
         }
     }
