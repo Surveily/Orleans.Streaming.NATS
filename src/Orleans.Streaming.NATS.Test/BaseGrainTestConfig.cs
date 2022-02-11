@@ -38,10 +38,6 @@ namespace Orleans.Streaming.NATS.Test
                        {
                            options.LocalAddress = IPAddress.Parse("127.0.0.1");
                        })
-                       .Configure<StreamPullingAgentOptions>(options =>
-                       {
-                           options.BatchContainerBatchSize = 256;
-                       })
                        .ConfigureEndpoints(IPAddress.Parse("127.0.0.1"), 22222, 30000, listenOnAnyHostAddress: true)
                        .AddMemoryGrainStorageAsDefault()
                        .AddMemoryGrainStorage("PubSubStore")
@@ -59,10 +55,6 @@ namespace Orleans.Streaming.NATS.Test
                              options.ClusterId = this.Id;
                              options.ServiceId = this.Id;
                          })
-                        .Configure<StreamPullingAgentOptions>(options =>
-                        {
-                            options.BatchContainerBatchSize = 256;
-                        })
                          .Configure<ClientMessagingOptions>(options =>
                          {
                              options.LocalAddress = IPAddress.Parse("127.0.0.1");
