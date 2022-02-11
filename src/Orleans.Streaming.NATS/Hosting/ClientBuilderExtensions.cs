@@ -2,6 +2,8 @@
 // Copyright (c) Surveily Sp. z o.o.. All rights reserved.
 // </copyright>
 
+using Orleans.Streaming.NATS.Streams;
+
 namespace Orleans.Streaming.NATS.Hosting
 {
     public static class ClientBuilderExtensions

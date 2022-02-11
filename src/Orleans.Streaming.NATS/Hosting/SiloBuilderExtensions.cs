@@ -3,6 +3,7 @@
 // </copyright>
 
 using Orleans.Hosting;
+using Orleans.Streaming.NATS.Streams;
 
 namespace Orleans.Streaming.NATS.Hosting
 {

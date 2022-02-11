@@ -9,7 +9,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers.Streams.Common;
 
-namespace Orleans.Streaming.NATS
+namespace Orleans.Streaming.NATS.Streams
 {
     public class SiloNatsStreamConfigurator : SiloPersistentStreamConfigurator
     {

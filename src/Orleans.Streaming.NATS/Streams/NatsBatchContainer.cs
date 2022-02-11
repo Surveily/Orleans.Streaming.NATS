@@ -11,7 +11,7 @@ using Orleans.Runtime;
 using Orleans.Serialization;
 using Orleans.Streams;
 
-namespace Orleans.Streaming.NATS
+namespace Orleans.Streaming.NATS.Streams
 {
     /// <summary>
     /// Generic container for NATS events.

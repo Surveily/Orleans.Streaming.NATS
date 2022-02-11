@@ -6,7 +6,7 @@ using NATS.Client.JetStream;
 using Orleans.Serialization;
 using Orleans.Streams;
 
-namespace Orleans.Streaming.NATS
+namespace Orleans.Streaming.NATS.Streams
 {
     /// <summary>
     /// The receiver class for NATS.

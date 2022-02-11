@@ -4,7 +4,7 @@
 
 using NATS.Client.JetStream;
 
-namespace Orleans.Streaming.NATS
+namespace Orleans.Streaming.NATS.Streams
 {
     public class NatsOptions
     {

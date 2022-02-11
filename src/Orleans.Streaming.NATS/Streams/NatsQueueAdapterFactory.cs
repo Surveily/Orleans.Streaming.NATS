@@ -12,7 +12,7 @@ using Orleans.Providers.Streams.Common;
 using Orleans.Serialization;
 using Orleans.Streams;
 
-namespace Orleans.Streaming.NATS
+namespace Orleans.Streaming.NATS.Streams
 {
     /// <summary>
     /// The factory for NATS queue adapters.
