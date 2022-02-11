@@ -65,7 +65,7 @@ namespace Orleans.Streaming.NATS.Streams
             var qr = cf.CreateConnection("nats://nats:4222");
             var jetStream = qr.CreateJetStreamContext();
 
-            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, jetStream, queueMapperOptions, cacheOptions, services, clusterOptions, natsOptions.StorageType);
+            return ActivatorUtilities.CreateInstance<NatsQueueAdapterFactory>(services, name, jetStream, queueMapperOptions, cacheOptions, services, clusterOptions, natsOptions!.StorageType);
         }
 
         public Task<IQueueAdapter> CreateAdapter()
