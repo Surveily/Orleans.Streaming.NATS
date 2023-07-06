@@ -14,7 +14,7 @@ namespace Orleans.Streaming.NATS.Test.Grains
         private IAsyncStream<BlobMessage> _blobStream;
         private IAsyncStream<SimpleMessage> _simpleStream;
 
-        public override async Task OnActivateAsync(CancellationToken cancellationToken)
+        public EmitterGrain()
         {
             var key = this.GetPrimaryKeyString().Split('/');
             var id = Guid.Parse(key[1]);
@@ -23,8 +23,6 @@ namespace Orleans.Streaming.NATS.Test.Grains
 
             _blobStream = streamProvider.GetStream<BlobMessage>(StreamId.Create(nameof(BlobMessage), id));
             _simpleStream = streamProvider.GetStream<SimpleMessage>(StreamId.Create(nameof(SimpleMessage), id));
-
-            await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task SendAsync(string text)
