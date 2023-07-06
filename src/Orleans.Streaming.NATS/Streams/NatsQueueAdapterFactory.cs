@@ -20,35 +20,35 @@ namespace Orleans.Streaming.NATS.Streams
     /// </summary>
     public class NatsQueueAdapterFactory : IQueueAdapterFactory
     {
-        private readonly string name;
+        private readonly string _name;
 
-        private readonly IJetStream jetStream;
+        private readonly IJetStream _jetStream;
 
-        private readonly ILoggerFactory loggerFactory;
+        private readonly ILoggerFactory _loggerFactory;
 
-        private readonly IQueueAdapterCache adapterCache;
+        private readonly IQueueAdapterCache _adapterCache;
 
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        private readonly SimpleQueueCacheOptions cacheOptions;
+        private readonly Serialization.Serializer _serializer;
 
-        private readonly IOptions<ClusterOptions> clusterOptions;
+        private readonly SimpleQueueCacheOptions _cacheOptions;
 
-        private readonly SerializationManager serializationManager;
+        private readonly IOptions<ClusterOptions> _clusterOptions;
 
-        private readonly HashRingBasedStreamQueueMapper streamQueueMapper;
+        private readonly HashRingBasedStreamQueueMapper _streamQueueMapper;
 
-        public NatsQueueAdapterFactory(string name, IJetStream jetStream, HashRingStreamQueueMapperOptions queueMapperOptions, SimpleQueueCacheOptions cacheOptions, IServiceProvider serviceProvider, IOptions<ClusterOptions> clusterOptions, SerializationManager serializationManager, ILoggerFactory loggerFactory)
+        public NatsQueueAdapterFactory(string name, IJetStream jetStream, HashRingStreamQueueMapperOptions queueMapperOptions, SimpleQueueCacheOptions cacheOptions, IServiceProvider serviceProvider, IOptions<ClusterOptions> clusterOptions, Serialization.Serializer serializer, ILoggerFactory loggerFactory)
         {
-            this.name = name;
-            this.jetStream = jetStream;
-            this.cacheOptions = cacheOptions;
-            this.loggerFactory = loggerFactory;
-            this.clusterOptions = clusterOptions;
-            this.serviceProvider = serviceProvider;
-            this.serializationManager = serializationManager;
-            this.streamQueueMapper = new HashRingBasedStreamQueueMapper(queueMapperOptions, this.name);
-            this.adapterCache = new SimpleQueueAdapterCache(cacheOptions, this.name, this.loggerFactory);
+            _name = name;
+            _jetStream = jetStream;
+            _serializer = serializer;
+            _cacheOptions = cacheOptions;
+            _loggerFactory = loggerFactory;
+            _clusterOptions = clusterOptions;
+            _serviceProvider = serviceProvider;
+            _streamQueueMapper = new HashRingBasedStreamQueueMapper(queueMapperOptions, _name);
+            _adapterCache = new SimpleQueueAdapterCache(cacheOptions, _name, _loggerFactory);
         }
 
         public static NatsQueueAdapterFactory Create(IServiceProvider services, string name)
@@ -67,7 +67,7 @@ namespace Orleans.Streaming.NATS.Streams
 
         public Task<IQueueAdapter> CreateAdapter()
         {
-            var adapter = new NatsQueueAdapter(this.serializationManager, this.streamQueueMapper, this.loggerFactory, this.jetStream);
+            var adapter = new NatsQueueAdapter(_serializer, _streamQueueMapper, _loggerFactory, _jetStream);
 
             return Task.FromResult<IQueueAdapter>(adapter);
         }
@@ -79,12 +79,12 @@ namespace Orleans.Streaming.NATS.Streams
 
         public IQueueAdapterCache GetQueueAdapterCache()
         {
-            return this.adapterCache;
+            return _adapterCache;
         }
 
         public IStreamQueueMapper GetStreamQueueMapper()
         {
-            return this.streamQueueMapper;
+            return _streamQueueMapper;
         }
     }
 }

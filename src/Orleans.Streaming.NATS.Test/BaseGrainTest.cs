@@ -15,14 +15,13 @@ using Polly.Retry;
 namespace Orleans.Streaming.NATS.Test
 {
     public abstract class BaseGrainTest<T>
-       where T : ISiloBuilderConfigurator, IClientBuilderConfigurator, new()
+        where T : ISiloConfigurator, IClientBuilderConfigurator, new()
     {
         public const int QueueNumber = 8;
         public const string NatsConnection = "nats://nats:4222";
 
-        private readonly AsyncRetryPolicy retryPolicy;
+        private readonly AsyncRetryPolicy _retryPolicy;
 
-#pragma warning disable CS8618
         public BaseGrainTest()
         {
             var factory = new ConnectionFactory();
@@ -36,15 +35,13 @@ namespace Orleans.Streaming.NATS.Test
             }
 
             var builder = new TestClusterBuilder(1);
-
             builder.AddSiloBuilderConfigurator<T>();
             builder.AddClientBuilderConfigurator<T>();
+            Subject = builder.Build();
 
-            this.Subject = builder.Build();
-            this.retryPolicy = Policy.Handle<OrleansMessageRejectionException>()
-                                     .WaitAndRetryAsync(10, f => TimeSpan.FromSeconds(5));
+            _retryPolicy = Policy.Handle<OrleansMessageRejectionException>()
+                                 .WaitAndRetryAsync(10, f => TimeSpan.FromSeconds(5));
         }
-#pragma warning restore CS8618
 
         public T Config { get; }
 
@@ -54,14 +51,9 @@ namespace Orleans.Streaming.NATS.Test
         {
             get
             {
-                var siloHandle = this.Subject.Primary as Orleans.TestingHost.InProcessSiloHandle;
+                var siloHandle = Subject.Primary as Orleans.TestingHost.InProcessSiloHandle;
 
-                if (siloHandle != null)
-                {
-                    return siloHandle.SiloHost.Services;
-                }
-
-                throw new InvalidOperationException("Subject.Primary is not a test host.");
+                return siloHandle.SiloHost.Services;
             }
         }
 
@@ -74,27 +66,27 @@ namespace Orleans.Streaming.NATS.Test
         [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            await this.retryPolicy.ExecuteAsync(async () =>
+            await _retryPolicy.ExecuteAsync(async () =>
             {
-                this.Subject.Deploy();
-
-                await this.Subject.WaitForLivenessToStabilizeAsync();
+                await Subject.DeployAsync();
+                await Subject.WaitForLivenessToStabilizeAsync();
             });
 
-            this.Prepare();
+            Prepare();
 
-            await this.Act();
+            await Act();
         }
 
         [OneTimeTearDown]
         public async Task TearDown()
         {
-            await this.Subject.StopAllSilosAsync();
+            await Subject.StopAllSilosAsync();
+            await Subject.DisposeAsync();
         }
 
         protected async Task WaitFor(Func<object> subject)
         {
-            await this.WaitFor(subject, TimeSpan.FromSeconds(3));
+            await WaitFor(subject, TimeSpan.FromSeconds(3));
         }
 
         protected async Task WaitFor(Func<object> subject, TimeSpan timeout)
@@ -106,7 +98,7 @@ namespace Orleans.Streaming.NATS.Test
                 while (subject() == null)
                 {
 #if DEBUG
-                    timeout = TimeSpan.FromMinutes(1);
+                    timeout = TimeSpan.FromMinutes(2);
 #endif
                     if (sw.Elapsed > timeout)
                     {
@@ -123,4 +115,3 @@ namespace Orleans.Streaming.NATS.Test
         }
     }
 }
-#pragma warning restore CS0618

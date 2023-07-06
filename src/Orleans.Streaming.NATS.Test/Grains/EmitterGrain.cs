@@ -3,6 +3,7 @@
 // </copyright>
 
 using Orleans.Concurrency;
+using Orleans.Runtime;
 using Orleans.Streaming.NATS.Test.Messages;
 using Orleans.Streams;
 
@@ -10,27 +11,27 @@ namespace Orleans.Streaming.NATS.Test.Grains
 {
     public class EmitterGrain : Grain, IEmitterGrain
     {
-        private IAsyncStream<BlobMessage>? blobStream;
-        private IAsyncStream<SimpleMessage>? simpleStream;
+        private IAsyncStream<BlobMessage> _blobStream;
+        private IAsyncStream<SimpleMessage> _simpleStream;
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var key = this.GetPrimaryKeyString().Split('/');
-            var streamProvider = this.GetStreamProvider("Default");
-
             var id = Guid.Parse(key[1]);
 
-            this.blobStream = streamProvider.GetStream<BlobMessage>(id, nameof(BlobMessage));
-            this.simpleStream = streamProvider.GetStream<SimpleMessage>(id, nameof(SimpleMessage));
+            var streamProvider = this.GetStreamProvider("Default");
 
-            await base.OnActivateAsync();
+            _blobStream = streamProvider.GetStream<BlobMessage>(StreamId.Create(nameof(BlobMessage), id));
+            _simpleStream = streamProvider.GetStream<SimpleMessage>(StreamId.Create(nameof(SimpleMessage), id));
+
+            await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task SendAsync(string text)
         {
-            if (this.simpleStream != null)
+            if (_simpleStream != null)
             {
-                await this.simpleStream.OnNextAsync(new SimpleMessage
+                await _simpleStream.OnNextAsync(new SimpleMessage
                 {
                     Text = new Immutable<string>(text),
                 });
@@ -39,9 +40,9 @@ namespace Orleans.Streaming.NATS.Test.Grains
 
         public async Task SendAsync(byte[] data)
         {
-            if (this.blobStream != null)
+            if (_blobStream != null)
             {
-                await this.blobStream.OnNextAsync(new BlobMessage
+                await _blobStream.OnNextAsync(new BlobMessage
                 {
                     Data = new Immutable<byte[]>(data),
                 });

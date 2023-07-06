@@ -6,8 +6,10 @@ using Orleans.Concurrency;
 
 namespace Orleans.Streaming.NATS.Test.Messages
 {
+    [GenerateSerializer]
     public class BlobMessage
     {
+        [Id(0)]
         public Immutable<byte[]> Data { get; set; }
     }
 }

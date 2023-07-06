@@ -17,6 +17,7 @@ namespace Orleans.Streaming.NATS.Streams
     /// Generic container for NATS events.
     /// </summary>
     [Serializable]
+    [GenerateSerializer]
     public class NatsBatchContainer : IBatchContainer
     {
         /// <summary>
@@ -26,68 +27,57 @@ namespace Orleans.Streaming.NATS.Streams
         public Msg? Message;
 
         [JsonProperty]
-        private readonly List<object> events;
+        [Id(1)]
+        private readonly List<object> _events;
 
         [JsonProperty]
-        private readonly Dictionary<string, object> requestContext;
+        [Id(2)]
+        private readonly Dictionary<string, object> _requestContext;
 
         [JsonProperty]
-        private EventSequenceTokenV2? sequenceToken;
+        [Id(0)]
+        private EventSequenceTokenV2 _sequenceToken;
 
         [JsonConstructor]
-        private NatsBatchContainer(Guid streamGuid, string streamNamespace, List<object> events, Dictionary<string, object> requestContext, EventSequenceTokenV2 sequenceToken)
-            : this(streamGuid, streamNamespace, events, requestContext)
+        private NatsBatchContainer(StreamId streamId,
+                                   List<object> events,
+                                   Dictionary<string, object> requestContext,
+                                   EventSequenceTokenV2 sequenceToken)
+            : this(streamId, events, requestContext)
         {
-            this.sequenceToken = sequenceToken;
+            _sequenceToken = sequenceToken;
         }
 
-        private NatsBatchContainer(Guid streamGuid, string streamNamespace, List<object> events, Dictionary<string, object> requestContext)
+        private NatsBatchContainer(StreamId streamId,
+                                   List<object> events,
+                                   Dictionary<string, object> requestContext)
         {
             if (events == null)
             {
                 throw new ArgumentNullException("events", "Message contains no events");
             }
 
-            this.events = events;
-            this.StreamGuid = streamGuid;
-            this.requestContext = requestContext;
-            this.StreamNamespace = streamNamespace;
+            StreamId = streamId;
+            _events = events;
+            _requestContext = requestContext;
         }
 
-        public Guid StreamGuid { get; private set; }
+        [Id(3)]
+        public StreamId StreamId { get; }
 
-        public string StreamNamespace { get; private set; }
-
-        public StreamSequenceToken? SequenceToken
-        {
-            get { return this.sequenceToken; }
-        }
+        public StreamSequenceToken SequenceToken => _sequenceToken;
 
         public IEnumerable<Tuple<T, StreamSequenceToken>> GetEvents<T>()
         {
-            return this.events.OfType<T>().Select((e, i) => Tuple.Create<T, StreamSequenceToken>(e, this.sequenceToken!.CreateSequenceTokenForEvent(i)));
+            return _events.OfType<T>().Select((e, i) => Tuple.Create<T, StreamSequenceToken>(e, _sequenceToken.CreateSequenceTokenForEvent(i)));
         }
 
         public bool ImportRequestContext()
         {
-            if (this.requestContext != null)
+            if (_requestContext != null)
             {
-                RequestContextExtensions.Import(this.requestContext);
-
+                RequestContextExtensions.Import(_requestContext);
                 return true;
-            }
-
-            return false;
-        }
-
-        public bool ShouldDeliver(IStreamIdentity stream, object filterData, StreamFilterPredicate shouldReceiveFunc)
-        {
-            foreach (object item in this.events)
-            {
-                if (shouldReceiveFunc(stream, filterData, item))
-                {
-                    return true;
-                }
             }
 
             return false;
@@ -95,31 +85,32 @@ namespace Orleans.Streaming.NATS.Streams
 
         public override string ToString()
         {
-            return string.Format($"[{nameof(NatsBatchContainer)}:Stream={0},#Items={1}]", this.StreamGuid, this.events.Count);
+            return string.Format($"[{nameof(NatsBatchContainer)}:Stream={0},#Items={1}]", StreamId, _events.Count);
         }
 
-        internal static Msg ToMessage<T>(SerializationManager serializationManager, Guid streamGuid, string streamNamespace, IEnumerable<T> events, Dictionary<string, object> requestContext)
+        internal static Msg ToMessage<T>(Serializer<NatsBatchContainer> serializer, StreamId streamId, IEnumerable<T> events, Dictionary<string, object> requestContext)
         {
-            var batchMessage = new NatsBatchContainer(streamGuid, streamNamespace, events.Cast<object>().ToList(), requestContext);
-            var rawBytes = serializationManager.SerializeToByteArray(batchMessage);
+            var batchMessage = new NatsBatchContainer(streamId, events.Cast<object>().ToList(), requestContext);
+            var rawBytes = serializer.SerializeToArray(batchMessage);
             var payload = new JObject();
 
             payload.Add("payload", JToken.FromObject(rawBytes));
 
-            return new Msg(streamNamespace, Encoding.Default.GetBytes(payload.ToString()));
+            return new Msg(Encoding.Default.GetString(streamId.Namespace.ToArray()), Encoding.Default.GetBytes(payload.ToString()));
         }
 
-        internal static NatsBatchContainer FromNatsMessage(SerializationManager serializationManager, Msg msg, long sequenceId)
+        internal static NatsBatchContainer FromNatsMessage(Serializer<NatsBatchContainer> serializer, Msg msg, long sequenceId)
         {
             var json = JObject.Parse(Encoding.Default.GetString(msg.Data));
             var payload = json["payload"];
 
             if (payload != null)
             {
-                var batch = serializationManager.DeserializeFromByteArray<NatsBatchContainer>(payload.ToObject<byte[]>());
+                var data = payload.ToObject<byte[]>();
+                var batch = serializer.Deserialize(data);
 
                 batch.Message = msg;
-                batch.sequenceToken = new EventSequenceTokenV2(sequenceId);
+                batch._sequenceToken = new EventSequenceTokenV2(sequenceId);
 
                 return batch;
             }

@@ -6,8 +6,10 @@ using Orleans.Concurrency;
 
 namespace Orleans.Streaming.NATS.Test.Messages
 {
+    [GenerateSerializer]
     public class SimpleMessage
     {
+        [Id(0)]
         public Immutable<string> Text { get; set; }
     }
 }

@@ -18,36 +18,31 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
     {
         public class Config : BaseGrainTestConfig, IDisposable
         {
-            private bool isDisposed;
-            private Mock<IProcessor> processor = new Mock<IProcessor>();
+            protected Mock<IProcessor> processor = new Mock<IProcessor>();
+            private bool _isDisposed;
 
-            public override void Configure(HostBuilderContext host, IServiceCollection services)
+            public override void Configure(IServiceCollection services)
             {
-                services.AddSingleton(this.processor);
-                services.AddSingleton(this.processor.Object);
-            }
-
-            public override void Configure(HostBuilderContext host, IConfigurationBuilder configuration)
-            {
-                /* host configuration code here */
+                services.AddSingleton(processor);
+                services.AddSingleton(processor.Object);
             }
 
             public void Dispose()
             {
-                this.Dispose(true);
+                Dispose(true);
                 GC.SuppressFinalize(this);
             }
 
             protected virtual void Dispose(bool disposing)
             {
-                if (!this.isDisposed)
+                if (!_isDisposed)
                 {
                     if (disposing)
                     {
                         /* dispose code here */
                     }
 
-                    this.isDisposed = true;
+                    _isDisposed = true;
                 }
             }
         }
@@ -58,7 +53,7 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
 
             public override void Prepare()
             {
-                this.Processor = this.Container.GetService<Mock<IProcessor>>();
+                Processor = Container.GetService<Mock<IProcessor>>();
 
                 base.Prepare();
             }
@@ -66,59 +61,59 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
 
         public class When_Sending_Simple_Message_One_To_One : BaseOneToOneTest
         {
-            private string result;
-            private string expected = "text";
+            protected string result;
+            protected string expected = "text";
 
             public override void Prepare()
             {
                 base.Prepare();
 
-                this.Processor!.Setup(x => x.Process(It.IsAny<string>()))
-                               .Callback<string>(x => this.result = x);
+                Processor!.Setup(x => x.Process(It.IsAny<string>()))
+                               .Callback<string>(x => result = x);
             }
 
             public override async Task Act()
             {
-                var grain = this.Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
+                var grain = Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
 
-                await grain.SendAsync(this.expected);
+                await grain.SendAsync(expected);
 
-                await this.WaitFor(() => this.result);
+                await WaitFor(() => result);
             }
 
             [Test]
             public void It_Should_Deliver_Text()
             {
-                this.Processor!.Verify(x => x.Process(this.expected), Times.Once);
+                Processor!.Verify(x => x.Process(expected), Times.Once);
             }
         }
 
         public class When_Sending_Blob_Message_One_To_One : BaseOneToOneTest
         {
-            private byte[] result;
-            private byte[] expected = new byte[1024];
+            protected byte[] result;
+            protected byte[] expected = new byte[1024];
 
             public override void Prepare()
             {
                 base.Prepare();
 
-                this.Processor!.Setup(x => x.Process(It.IsAny<byte[]>()))
-                               .Callback<byte[]>(x => this.result = x);
+                Processor!.Setup(x => x.Process(It.IsAny<byte[]>()))
+                               .Callback<byte[]>(x => result = x);
             }
 
             public override async Task Act()
             {
-                var grain = this.Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
+                var grain = Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
 
-                await grain.SendAsync(this.expected);
+                await grain.SendAsync(expected);
 
-                await this.WaitFor(() => this.result);
+                await WaitFor(() => result);
             }
 
             [Test]
             public void It_Should_Deliver_Data()
             {
-                this.Processor!.Verify(x => x.Process(this.expected), Times.Once);
+                Processor!.Verify(x => x.Process(expected), Times.Once);
             }
         }
     }

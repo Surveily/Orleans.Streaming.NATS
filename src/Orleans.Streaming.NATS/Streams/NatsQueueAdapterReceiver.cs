@@ -13,19 +13,19 @@ namespace Orleans.Streaming.NATS.Streams
     /// </summary>
     public class NatsQueueAdapterReceiver : IQueueAdapterReceiver
     {
-        private readonly string stream;
+        private readonly string _stream;
 
-        private readonly IJetStream jetStream;
+        private readonly IJetStream _jetStream;
 
-        private readonly SerializationManager serializationManager;
+        private readonly Serializer<NatsBatchContainer> _serializationManager;
 
-        private TimeSpan timeout;
+        private TimeSpan _timeout;
 
-        private long lastReadMessage;
+        private long _lastReadMessage;
 
-        private IJetStreamPullSubscription? subscription;
+        private IJetStreamPullSubscription? _subscription;
 
-        public NatsQueueAdapterReceiver(SerializationManager serializationManager, IJetStream jetStream, string stream)
+        public NatsQueueAdapterReceiver(Serializer<NatsBatchContainer> serializationManager, IJetStream jetStream, string stream)
         {
             if (stream == null)
             {
@@ -37,10 +37,10 @@ namespace Orleans.Streaming.NATS.Streams
                 throw new ArgumentException(nameof(jetStream));
             }
 
-            this.stream = stream;
-            this.jetStream = jetStream;
-            this.timeout = TimeSpan.FromSeconds(1);
-            this.serializationManager = serializationManager;
+            _stream = stream;
+            _jetStream = jetStream;
+            _timeout = TimeSpan.FromSeconds(1);
+            _serializationManager = serializationManager;
         }
 
         public Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
@@ -51,11 +51,11 @@ namespace Orleans.Streaming.NATS.Streams
                    MaxNumberOfMessagesToPeek : Math.Min(maxCount, MaxNumberOfMessagesToPeek);
 
             var result = new List<IBatchContainer>();
-            var fetched = this.subscription!.Fetch(count, (int)this.timeout.TotalMilliseconds);
+            var fetched = _subscription!.Fetch(count, (int)_timeout.TotalMilliseconds);
 
             foreach (var message in fetched)
             {
-                result.Add(NatsBatchContainer.FromNatsMessage(this.serializationManager, message, this.lastReadMessage++));
+                result.Add(NatsBatchContainer.FromNatsMessage(_serializationManager, message, _lastReadMessage++));
             }
 
             return Task.FromResult(result as IList<IBatchContainer>);
@@ -63,13 +63,13 @@ namespace Orleans.Streaming.NATS.Streams
 
         public Task Initialize(TimeSpan timeout)
         {
-            var cc = Nats.GetConsumer(this.stream);
+            var cc = Nats.GetConsumer(_stream);
             var options = PullSubscribeOptions.Builder()
                                               .WithConfiguration(cc)
                                               .Build();
 
-            this.timeout = timeout;
-            this.subscription = this.jetStream.PullSubscribe($"{this.stream}.request", options);
+            _timeout = timeout;
+            _subscription = _jetStream.PullSubscribe($"{_stream}.request", options);
 
             return Task.CompletedTask;
         }
@@ -90,9 +90,9 @@ namespace Orleans.Streaming.NATS.Streams
 
         public Task Shutdown(TimeSpan timeout)
         {
-            if (this.subscription != null)
+            if (_subscription != null)
             {
-                this.subscription.Dispose();
+                _subscription.Dispose();
             }
 
             return Task.CompletedTask;

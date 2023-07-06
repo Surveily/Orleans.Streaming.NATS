@@ -2,6 +2,7 @@
 // Copyright (c) Surveily Sp. z o.o.. All rights reserved.
 // </copyright>
 
+using Orleans.Runtime;
 using Orleans.Streaming.NATS.Test.Messages;
 using Orleans.Streams;
 
@@ -10,29 +11,25 @@ namespace Orleans.Streaming.NATS.Test.Grains
     [ImplicitStreamSubscription(nameof(SimpleMessage))]
     public class SimpleReceiverGrain : Grain, ISimpleReceiverGrain
     {
-        private readonly IProcessor processor;
-
-        private object? subscription;
-        private IAsyncStream<SimpleMessage>? input;
+        private readonly IProcessor _processor;
 
         public SimpleReceiverGrain(IProcessor processor)
         {
-            this.processor = processor;
+            _processor = processor;
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var streamProvider = this.GetStreamProvider("Default");
+            var streamId = StreamId.Create(nameof(SimpleMessage), this.GetPrimaryKey());
+            var stream = streamProvider.GetStream<SimpleMessage>(streamId);
 
-            this.input = streamProvider.GetStream<SimpleMessage>(this.GetPrimaryKey(), nameof(SimpleMessage));
-            this.subscription = await this.input.SubscribeAsync<SimpleMessage>(this.OnNextAsync);
-
-            await base.OnActivateAsync();
+            await stream.SubscribeAsync(OnNextAsync);
         }
 
         private Task OnNextAsync(SimpleMessage message, StreamSequenceToken token)
         {
-            this.processor.Process(message.Text.Value);
+            _processor.Process(message.Text.Value);
 
             return Task.CompletedTask;
         }

@@ -13,56 +13,27 @@ using Orleans.TestingHost;
 
 namespace Orleans.Streaming.NATS.Test
 {
-    public abstract class BaseGrainTestConfig : ISiloBuilderConfigurator, IClientBuilderConfigurator
+    public abstract class BaseGrainTestConfig : ISiloConfigurator, IClientBuilderConfigurator
     {
-        protected string Id => $"{Guid.NewGuid()}";
+        public abstract void Configure(IServiceCollection services);
 
-        public abstract void Configure(HostBuilderContext host, IServiceCollection services);
-
-        public abstract void Configure(HostBuilderContext host, IConfigurationBuilder configuration);
-
-        public void Configure(ISiloHostBuilder hostBuilder)
+        public void Configure(ISiloBuilder siloBuilder)
         {
-            hostBuilder.ConfigureServices(this.Configure)
-                       .ConfigureAppConfiguration(this.Configure)
-                       .Configure<ClusterOptions>(options =>
-                       {
-                           options.ClusterId = this.Id;
-                           options.ServiceId = this.Id;
-                       })
-                       .Configure<SiloOptions>(options =>
-                       {
-                           options.SiloName = this.Id;
-                       })
-                       .Configure<ClientMessagingOptions>(options =>
-                       {
-                           options.LocalAddress = IPAddress.Parse("127.0.0.1");
-                       })
-                       .ConfigureEndpoints(IPAddress.Parse("127.0.0.1"), 22222, 30000, listenOnAnyHostAddress: true)
+            siloBuilder.ConfigureServices(Configure)
                        .AddMemoryGrainStorageAsDefault()
                        .AddMemoryGrainStorage("PubSubStore")
                        .AddNatsStreams("Default", configureOptions: options =>
                        {
                            options.ConnectionString = "nats://nats:4222";
                        });
-            /* .AddMemoryStreams<DefaultMemoryMessageBodySerializer>("Default"); */
         }
 
         public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
         {
-            clientBuilder.Configure<ClusterOptions>(options =>
-                         {
-                             options.ClusterId = this.Id;
-                             options.ServiceId = this.Id;
-                         })
-                         .Configure<ClientMessagingOptions>(options =>
-                         {
-                             options.LocalAddress = IPAddress.Parse("127.0.0.1");
-                         })
-                         .AddNatsStreams("Default", configureOptions: options =>
-                         {
-                             options.ConnectionString = "nats://nats:4222";
-                         });
+            clientBuilder.AddNatsStreams("Default", configureOptions: options =>
+                       {
+                           options.ConnectionString = "nats://nats:4222";
+                       });
         }
     }
 }

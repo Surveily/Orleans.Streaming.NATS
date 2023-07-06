@@ -4,7 +4,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Orleans.ApplicationParts;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers.Streams.Common;
@@ -13,16 +12,10 @@ namespace Orleans.Streaming.NATS.Streams
 {
     public class SiloNatsStreamConfigurator : SiloPersistentStreamConfigurator
     {
-        public SiloNatsStreamConfigurator(string name, Action<Action<IServiceCollection>> configureServicesDelegate, Action<Action<IApplicationPartManager>> configureAppPartsDelegate)
+        public SiloNatsStreamConfigurator(string name, Action<Action<IServiceCollection>> configureServicesDelegate)
             : base(name, configureServicesDelegate, NatsQueueAdapterFactory.Create)
         {
-            configureAppPartsDelegate(parts =>
-            {
-                parts.AddFrameworkPart(typeof(NatsQueueAdapterFactory).Assembly)
-                     .AddFrameworkPart(typeof(EventSequenceTokenV2).Assembly);
-            });
-
-            this.ConfigureDelegate(services =>
+            ConfigureDelegate(services =>
             {
                 services.ConfigureNamedOptionForLogging<NatsOptions>(name)
                         .ConfigureNamedOptionForLogging<SimpleQueueCacheOptions>(name)
@@ -54,12 +47,7 @@ namespace Orleans.Streaming.NATS.Streams
         public ClusterClientNatsStreamConfigurator(string name, IClientBuilder builder)
             : base(name, builder, NatsQueueAdapterFactory.Create)
         {
-            builder.ConfigureApplicationParts(parts =>
-                   {
-                       parts.AddFrameworkPart(typeof(NatsQueueAdapterFactory).Assembly)
-                            .AddFrameworkPart(typeof(EventSequenceTokenV2).Assembly);
-                   })
-                   .ConfigureServices(services =>
+            builder.ConfigureServices(services =>
                    {
                        services.ConfigureNamedOptionForLogging<NatsOptions>(name)
                                .ConfigureNamedOptionForLogging<HashRingStreamQueueMapperOptions>(name);

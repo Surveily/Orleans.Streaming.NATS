@@ -13,7 +13,7 @@ namespace Orleans.Streaming.NATS.Test
 #pragma warning disable CS8618
         public BaseTest()
         {
-            this.Services = new ServiceCollection();
+            Services = new ServiceCollection();
         }
 #pragma warning restore CS8618
 
@@ -24,12 +24,12 @@ namespace Orleans.Streaming.NATS.Test
         [OneTimeSetUp]
         public virtual Task SetupAsync()
         {
-            if (this.Services.All(x => x.ServiceType != typeof(T)))
+            if (Services.All(x => x.ServiceType != typeof(T)))
             {
-                this.Services.AddTransient<T>();
+                Services.AddTransient<T>();
             }
 
-            var provider = this.Services.BuildServiceProvider();
+            var provider = Services.BuildServiceProvider();
 
             if (provider != null)
             {
@@ -37,7 +37,7 @@ namespace Orleans.Streaming.NATS.Test
 
                 if (service != null)
                 {
-                    this.Subject = service;
+                    Subject = service;
                 }
                 else
                 {

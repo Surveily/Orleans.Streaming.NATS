@@ -2,6 +2,7 @@
 // Copyright (c) Surveily Sp. z o.o.. All rights reserved.
 // </copyright>
 
+using Orleans.Runtime;
 using Orleans.Streaming.NATS.Test.Messages;
 using Orleans.Streams;
 
@@ -10,29 +11,25 @@ namespace Orleans.Streaming.NATS.Test.Grains
     [ImplicitStreamSubscription(nameof(BlobMessage))]
     public class BlobReceiverGrain : Grain, IBlobReceiverGrain
     {
-        private readonly IProcessor processor;
-
-        private object? subscription;
-        private IAsyncStream<BlobMessage>? input;
+        private readonly IProcessor _processor;
 
         public BlobReceiverGrain(IProcessor processor)
         {
-            this.processor = processor;
+            _processor = processor;
         }
 
-        public override async Task OnActivateAsync()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var streamProvider = this.GetStreamProvider("Default");
+            var streamId = StreamId.Create(nameof(BlobMessage), this.GetPrimaryKey());
+            var stream = streamProvider.GetStream<BlobMessage>(streamId);
 
-            this.input = streamProvider.GetStream<BlobMessage>(this.GetPrimaryKey(), nameof(BlobMessage));
-            this.subscription = await this.input.SubscribeAsync<BlobMessage>(this.OnNextAsync);
-
-            await base.OnActivateAsync();
+            await stream.SubscribeAsync(OnNextAsync);
         }
 
         private Task OnNextAsync(BlobMessage message, StreamSequenceToken token)
         {
-            this.processor.Process(message.Data.Value);
+            _processor.Process(message.Data.Value);
 
             return Task.CompletedTask;
         }

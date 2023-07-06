@@ -12,34 +12,29 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
     {
         public class Config : BaseGrainTestConfig, IDisposable
         {
-            private bool isDisposed;
+            private bool _isDisposed;
 
-            public override void Configure(HostBuilderContext host, IServiceCollection services)
+            public override void Configure(IServiceCollection services)
             {
                 /* dependency injection code here */
             }
 
-            public override void Configure(HostBuilderContext host, IConfigurationBuilder configuration)
-            {
-                /* host configuration code here */
-            }
-
             public void Dispose()
             {
-                this.Dispose(true);
+                Dispose(true);
                 GC.SuppressFinalize(this);
             }
 
             protected virtual void Dispose(bool disposing)
             {
-                if (!this.isDisposed)
+                if (!_isDisposed)
                 {
                     if (disposing)
                     {
                         /* dispose code here */
                     }
 
-                    this.isDisposed = true;
+                    _isDisposed = true;
                 }
             }
         }

@@ -4,6 +4,7 @@
 
 using Microsoft.Extensions.Logging;
 using NATS.Client.JetStream;
+using Orleans.Runtime;
 using Orleans.Serialization;
 using Orleans.Streams;
 
@@ -14,20 +15,20 @@ namespace Orleans.Streaming.NATS.Streams
     /// </summary>
     public class NatsQueueAdapter : IQueueAdapter
     {
-        private readonly IJetStream jetStream;
+        private readonly IJetStream _jetStream;
 
-        private readonly ILoggerFactory loggerFactory;
+        private readonly ILoggerFactory _loggerFactory;
 
-        private readonly SerializationManager serializationManager;
+        private readonly Serializer<NatsBatchContainer> _serializer;
 
-        private readonly IConsistentRingStreamQueueMapper streamQueueMapper;
+        private readonly IConsistentRingStreamQueueMapper _streamQueueMapper;
 
-        public NatsQueueAdapter(SerializationManager serializationManager, IConsistentRingStreamQueueMapper streamQueueMapper, ILoggerFactory loggerFactory, IJetStream jetStream)
+        public NatsQueueAdapter(Serializer serializer, IConsistentRingStreamQueueMapper streamQueueMapper, ILoggerFactory loggerFactory, IJetStream jetStream)
         {
-            this.jetStream = jetStream;
-            this.loggerFactory = loggerFactory;
-            this.streamQueueMapper = streamQueueMapper;
-            this.serializationManager = serializationManager;
+            _jetStream = jetStream;
+            _loggerFactory = loggerFactory;
+            _streamQueueMapper = streamQueueMapper;
+            _serializer = serializer.GetSerializer<NatsBatchContainer>();
         }
 
         public string Name => nameof(NatsQueueAdapter);
@@ -38,19 +39,19 @@ namespace Orleans.Streaming.NATS.Streams
 
         public IQueueAdapterReceiver CreateReceiver(QueueId queueId)
         {
-            return new NatsQueueAdapterReceiver(this.serializationManager, this.jetStream, queueId.ToString());
+            return new NatsQueueAdapterReceiver(_serializer, _jetStream, queueId.ToString());
         }
 
-        public async Task QueueMessageBatchAsync<T>(Guid streamGuid, string streamNamespace, IEnumerable<T> events, StreamSequenceToken token, Dictionary<string, object> requestContext)
+        public async Task QueueMessageBatchAsync<T>(StreamId streamId, IEnumerable<T> events, StreamSequenceToken token, Dictionary<string, object> requestContext)
         {
-            var queueId = this.streamQueueMapper.GetQueueForStream(streamGuid, streamNamespace);
-            var message = NatsBatchContainer.ToMessage(this.serializationManager, streamGuid, streamNamespace, events, requestContext);
+            var queueId = _streamQueueMapper.GetQueueForStream(streamId);
+            var message = NatsBatchContainer.ToMessage(_serializer, streamId, events, requestContext);
             var builder = PublishOptions.Builder()
                                         .WithTimeout(1000)
                                         .WithStream(queueId.ToString())
                                         .WithMessageId(Guid.NewGuid().ToString());
 
-            var ack = await this.jetStream.PublishAsync($"{queueId}.request", message.Data, builder.Build());
+            var ack = await _jetStream.PublishAsync($"{queueId}.request", message.Data, builder.Build());
         }
     }
 }
