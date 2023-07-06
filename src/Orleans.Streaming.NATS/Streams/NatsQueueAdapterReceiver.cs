@@ -47,10 +47,11 @@ namespace Orleans.Streaming.NATS.Streams
         {
             const int MaxNumberOfMessagesToPeek = 256;
 
+            IList<IBatchContainer> result = new List<IBatchContainer>();
+
             int count = maxCount < 0 || maxCount == QueueAdapterConstants.UNLIMITED_GET_QUEUE_MSG ?
                    MaxNumberOfMessagesToPeek : Math.Min(maxCount, MaxNumberOfMessagesToPeek);
 
-            var result = new List<IBatchContainer>();
             var fetched = _subscription!.Fetch(count, (int)_timeout.TotalMilliseconds);
 
             foreach (var message in fetched)
@@ -58,7 +59,7 @@ namespace Orleans.Streaming.NATS.Streams
                 result.Add(NatsBatchContainer.FromNatsMessage(_serializationManager, message, _lastReadMessage++));
             }
 
-            return Task.FromResult(result as IList<IBatchContainer>);
+            return Task.FromResult(result);
         }
 
         public Task Initialize(TimeSpan timeout)

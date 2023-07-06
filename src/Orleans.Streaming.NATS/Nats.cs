@@ -48,7 +48,7 @@ namespace Orleans.Streaming.NATS
         /// <param name="storageType">Stream storage type.</param>
         public static void Prepare(IJetStreamManagement management, string stream, StorageType storageType)
         {
-            StreamInfo? streamInfo = null;
+            StreamInfo streamInfo = null;
 
             try
             {
@@ -69,7 +69,7 @@ namespace Orleans.Streaming.NATS
                 management.AddStream(sc);
             }
 
-            ConsumerInfo? consumerInfo = null;
+            ConsumerInfo consumerInfo = null;
 
             if (streamInfo != null)
             {
@@ -101,7 +101,7 @@ namespace Orleans.Streaming.NATS
         /// <param name="stream">Stream name.</param>
         public static void Delete(IJetStreamManagement management, string stream)
         {
-            StreamInfo? streamInfo = null;
+            StreamInfo streamInfo = null;
 
             try
             {

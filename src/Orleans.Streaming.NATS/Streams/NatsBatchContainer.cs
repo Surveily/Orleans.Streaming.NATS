@@ -24,7 +24,7 @@ namespace Orleans.Streaming.NATS.Streams
         /// Need to store reference to the original Message to be able to delete it later on.
         /// </summary>
         [NonSerialized]
-        public Msg? Message;
+        public Msg Message;
 
         [JsonProperty]
         [Id(1)]
@@ -88,9 +88,10 @@ namespace Orleans.Streaming.NATS.Streams
         {
             var batchMessage = new NatsBatchContainer(streamId, events.Cast<object>().ToList(), requestContext);
             var rawBytes = serializer.SerializeToArray(batchMessage);
-            var payload = new JObject();
-
-            payload.Add("payload", JToken.FromObject(rawBytes));
+            var payload = new JObject
+            {
+                { "payload", JToken.FromObject(rawBytes) }
+            };
 
             return new Msg(Encoding.Default.GetString(streamId.Namespace.ToArray()), Encoding.Default.GetBytes(payload.ToString()));
         }
