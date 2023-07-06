@@ -49,7 +49,7 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
 
         public abstract class BaseOneToOneTest : BaseGrainTest<Config>
         {
-            protected Mock<IProcessor>? Processor { get; set; }
+            protected Mock<IProcessor> Processor { get; set; }
 
             public override void Prepare()
             {
