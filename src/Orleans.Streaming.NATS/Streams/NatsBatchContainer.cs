@@ -52,14 +52,10 @@ namespace Orleans.Streaming.NATS.Streams
                                    List<object> events,
                                    Dictionary<string, object> requestContext)
         {
-            if (events == null)
-            {
-                throw new ArgumentNullException("events", "Message contains no events");
-            }
-
             StreamId = streamId;
-            _events = events;
+
             _requestContext = requestContext;
+            _events = events ?? throw new ArgumentNullException(nameof(events), "Message contains no events");
         }
 
         [Id(3)]

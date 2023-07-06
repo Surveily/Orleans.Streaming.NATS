@@ -47,7 +47,7 @@ namespace Orleans.Streaming.NATS.Streams
             var queueId = _streamQueueMapper.GetQueueForStream(streamId);
             var message = NatsBatchContainer.ToMessage(_serializer, streamId, events, requestContext);
             var builder = PublishOptions.Builder()
-                                        .WithTimeout(1000)
+                                        .WithTimeout(5000)
                                         .WithStream(queueId.ToString())
                                         .WithMessageId(Guid.NewGuid().ToString());
 
