@@ -23,7 +23,7 @@ namespace Orleans.Streaming.NATS.Streams
 
         private long _lastReadMessage;
 
-        private IJetStreamPullSubscription? _subscription;
+        private IJetStreamPullSubscription _subscription;
 
         public NatsQueueAdapterReceiver(Serializer<NatsBatchContainer> serializationManager, IJetStream jetStream, string stream)
         {
@@ -52,7 +52,7 @@ namespace Orleans.Streaming.NATS.Streams
             int count = maxCount < 0 || maxCount == QueueAdapterConstants.UNLIMITED_GET_QUEUE_MSG ?
                    MaxNumberOfMessagesToPeek : Math.Min(maxCount, MaxNumberOfMessagesToPeek);
 
-            var fetched = _subscription!.Fetch(count, (int)_timeout.TotalMilliseconds);
+            var fetched = _subscription.Fetch(count, (int)_timeout.TotalMilliseconds);
 
             foreach (var message in fetched)
             {

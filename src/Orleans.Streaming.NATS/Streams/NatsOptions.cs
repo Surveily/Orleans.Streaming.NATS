@@ -9,6 +9,6 @@ namespace Orleans.Streaming.NATS.Streams
     public class NatsOptions
     {
         [Redact]
-        public string? ConnectionString { get; set; }
+        public string ConnectionString { get; set; }
     }
 }

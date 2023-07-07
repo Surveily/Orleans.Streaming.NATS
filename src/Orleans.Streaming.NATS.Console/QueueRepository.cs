@@ -37,7 +37,7 @@ namespace Nats
 
         public void Prepare(string stream)
         {
-            StreamInfo? streamInfo = null;
+            StreamInfo streamInfo = null;
 
             try
             {
@@ -55,7 +55,7 @@ namespace Nats
                 _management.AddStream(sc);
             }
 
-            ConsumerInfo? consumerInfo = null;
+            ConsumerInfo consumerInfo = null;
 
             try
             {
