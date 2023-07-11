@@ -4,7 +4,7 @@
 
 namespace Orleans.Streaming.NATS.Test.Grains
 {
-    public interface IEmitterGrain : IGrainWithStringKey
+    public interface IEmitterGrain : IGrainWithGuidKey
     {
         Task SendAsync(string text);
 

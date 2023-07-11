@@ -69,12 +69,12 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
                 base.Prepare();
 
                 Processor!.Setup(x => x.Process(It.IsAny<string>()))
-                               .Callback<string>(x => result = x);
+                          .Callback<string>(x => result = x);
             }
 
             public override async Task Act()
             {
-                var grain = Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
+                var grain = Subject.GrainFactory.GetGrain<IEmitterGrain>(Guid.NewGuid());
 
                 await grain.SendAsync(expected);
 
@@ -98,12 +98,12 @@ namespace Orleans.Streaming.NATS.Test.Scenarios
                 base.Prepare();
 
                 Processor!.Setup(x => x.Process(It.IsAny<byte[]>()))
-                               .Callback<byte[]>(x => result = x);
+                          .Callback<byte[]>(x => result = x);
             }
 
             public override async Task Act()
             {
-                var grain = Subject.GrainFactory.GetGrain<IEmitterGrain>($"{1}/{Guid.NewGuid()}");
+                var grain = Subject.GrainFactory.GetGrain<IEmitterGrain>(Guid.NewGuid());
 
                 await grain.SendAsync(expected);
 

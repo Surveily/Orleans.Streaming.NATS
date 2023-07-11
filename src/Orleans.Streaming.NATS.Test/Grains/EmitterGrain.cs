@@ -14,15 +14,15 @@ namespace Orleans.Streaming.NATS.Test.Grains
         private IAsyncStream<BlobMessage> _blobStream;
         private IAsyncStream<SimpleMessage> _simpleStream;
 
-        public EmitterGrain()
+        public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            var key = this.GetPrimaryKeyString().Split('/');
-            var id = Guid.Parse(key[1]);
-
+            var id = this.GetPrimaryKey();
             var streamProvider = this.GetStreamProvider("Default");
 
             _blobStream = StreamFactory.Create<BlobMessage>(streamProvider, id);
             _simpleStream = StreamFactory.Create<SimpleMessage>(streamProvider, id);
+
+            await base.OnActivateAsync(cancellationToken);
         }
 
         public async Task SendAsync(string text)
