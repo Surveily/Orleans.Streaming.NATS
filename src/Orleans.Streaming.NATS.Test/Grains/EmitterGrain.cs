@@ -21,8 +21,8 @@ namespace Orleans.Streaming.NATS.Test.Grains
 
             var streamProvider = this.GetStreamProvider("Default");
 
-            _blobStream = streamProvider.GetStream<BlobMessage>(StreamId.Create(nameof(BlobMessage), id));
-            _simpleStream = streamProvider.GetStream<SimpleMessage>(StreamId.Create(nameof(SimpleMessage), id));
+            _blobStream = StreamFactory.Create<BlobMessage>(streamProvider, id);
+            _simpleStream = StreamFactory.Create<SimpleMessage>(streamProvider, id);
         }
 
         public async Task SendAsync(string text)

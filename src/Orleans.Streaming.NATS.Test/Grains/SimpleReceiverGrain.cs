@@ -13,6 +13,8 @@ namespace Orleans.Streaming.NATS.Test.Grains
     {
         private readonly IProcessor _processor;
 
+        private StreamSubscriptionHandle<SimpleMessage> _subscription;
+
         public SimpleReceiverGrain(IProcessor processor)
         {
             _processor = processor;
@@ -21,10 +23,9 @@ namespace Orleans.Streaming.NATS.Test.Grains
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var streamProvider = this.GetStreamProvider("Default");
-            var streamId = StreamId.Create(nameof(SimpleMessage), this.GetPrimaryKey());
-            var stream = streamProvider.GetStream<SimpleMessage>(streamId);
+            var stream = StreamFactory.Create<SimpleMessage>(streamProvider, this.GetPrimaryKey());
 
-            await stream.SubscribeAsync(OnNextAsync);
+            _subscription = await stream.SubscribeAsync(OnNextAsync);
         }
 
         private Task OnNextAsync(SimpleMessage message, StreamSequenceToken token)

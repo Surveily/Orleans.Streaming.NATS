@@ -13,6 +13,8 @@ namespace Orleans.Streaming.NATS.Test.Grains
     {
         private readonly IProcessor _processor;
 
+        private StreamSubscriptionHandle<BlobMessage> _subscription;
+
         public BlobReceiverGrain(IProcessor processor)
         {
             _processor = processor;
@@ -21,10 +23,9 @@ namespace Orleans.Streaming.NATS.Test.Grains
         public override async Task OnActivateAsync(CancellationToken cancellationToken)
         {
             var streamProvider = this.GetStreamProvider("Default");
-            var streamId = StreamId.Create(nameof(BlobMessage), this.GetPrimaryKey());
-            var stream = streamProvider.GetStream<BlobMessage>(streamId);
+            var stream = StreamFactory.Create<BlobMessage>(streamProvider, this.GetPrimaryKey());
 
-            await stream.SubscribeAsync(OnNextAsync);
+            _subscription = await stream.SubscribeAsync(OnNextAsync);
         }
 
         private Task OnNextAsync(BlobMessage message, StreamSequenceToken token)
