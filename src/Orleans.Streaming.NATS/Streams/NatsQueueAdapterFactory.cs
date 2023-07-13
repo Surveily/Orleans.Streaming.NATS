@@ -67,7 +67,7 @@ namespace Orleans.Streaming.NATS.Streams
 
         public Task<IQueueAdapter> CreateAdapter()
         {
-            var adapter = new NatsQueueAdapter(_serializer, _streamQueueMapper, _loggerFactory, _jetStream);
+            var adapter = new NatsQueueAdapter(_serializer, _streamQueueMapper, _loggerFactory, _jetStream, _name);
 
             return Task.FromResult<IQueueAdapter>(adapter);
         }
