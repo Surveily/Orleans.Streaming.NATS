@@ -1,6 +1,6 @@
 # Orleans.Streaming.NATS
 
-WIP: Still not fully working. Currently trying to plug in the NATS.io provider into the TestingHost from the **Orleans.Streaming.Nats.Test** project.
+WIP: Working, not for production use.
 
 Project contains:
 
