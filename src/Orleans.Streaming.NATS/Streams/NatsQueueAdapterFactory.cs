@@ -38,7 +38,14 @@ namespace Orleans.Streaming.NATS.Streams
 
         private readonly HashRingBasedStreamQueueMapper _streamQueueMapper;
 
-        public NatsQueueAdapterFactory(string name, IJetStream jetStream, HashRingStreamQueueMapperOptions queueMapperOptions, SimpleQueueCacheOptions cacheOptions, IServiceProvider serviceProvider, IOptions<ClusterOptions> clusterOptions, Serialization.Serializer serializer, ILoggerFactory loggerFactory)
+        public NatsQueueAdapterFactory(string name,
+                                       IJetStream jetStream,
+                                       HashRingStreamQueueMapperOptions queueMapperOptions,
+                                       SimpleQueueCacheOptions cacheOptions,
+                                       IServiceProvider serviceProvider,
+                                       IOptions<ClusterOptions> clusterOptions,
+                                       Serialization.Serializer serializer,
+                                       ILoggerFactory loggerFactory)
         {
             _name = name;
             _jetStream = jetStream;

@@ -25,7 +25,11 @@ namespace Orleans.Streaming.NATS.Streams
 
         private readonly IConsistentRingStreamQueueMapper _streamQueueMapper;
 
-        public NatsQueueAdapter(Serializer serializer, IConsistentRingStreamQueueMapper streamQueueMapper, ILoggerFactory loggerFactory, IJetStream jetStream, string providerName)
+        public NatsQueueAdapter(Serializer serializer,
+                                IConsistentRingStreamQueueMapper streamQueueMapper,
+                                ILoggerFactory loggerFactory,
+                                IJetStream jetStream,
+                                string providerName)
         {
             _jetStream = jetStream;
             _loggerFactory = loggerFactory;
